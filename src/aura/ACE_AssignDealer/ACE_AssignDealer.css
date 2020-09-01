@@ -1,0 +1,9 @@
+.THIS .cityList{
+        width: 10% !important; 
+}
+.THIS .slds-radio_faux{
+        border-radius: 1px;
+}
+.THIS .label-hidden > label {
+    display: none;
+}

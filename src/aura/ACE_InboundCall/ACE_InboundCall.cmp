@@ -1,0 +1,20 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,lightning:isUrlAddressable" access="global" >
+    <aura:attribute name="mobileNumber" type="String" default=""/>
+    <aura:attribute name="contactDetails" type="Contact" />
+     <aura:attribute name="NewCustomer" type="Map" default="{'FirstName':'','LastName':'', 'MobileNumber':'','ServiceCode':'',
+                                                           'City':'', 'Comments':'', 'Email':'', 'callType':''}"/>
+    
+     <aura:handler name="relatedContact" event="c:ACE_AssignContact" action="{!c.fetchRelatedContact}"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" description="Init page load"/>
+    <aura:handler name="change" value="{!v.pageReference}" action="{!c.doInit}"/>
+   
+    <!--Lightning Workspace API-->
+    <lightning:workspaceAPI aura:id="workspace"/>
+    
+    <div style="float:left;padding-right : 20px;width:50%">
+        <c:ACE_Inbound_Component  NewCustomer="{!v.NewCustomer}" relatedContactDetails="{!v.contactDetails}"/>
+    </div>
+    <div style="float:left;width:50%">
+        <c:ACE_CustomerSearch_Component isInboundSide="true" aura:id="cAccountSearch" relatedContactDetails="{!v.contactDetails}" searchText="{!v.mobileNumber}" searchOptionValue="mobile"/>
+    </div> 
+</aura:component>

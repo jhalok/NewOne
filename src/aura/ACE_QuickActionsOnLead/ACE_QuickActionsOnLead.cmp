@@ -1,0 +1,407 @@
+<aura:component controller="ACE_LeadQuickActionsController"
+                implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:attribute name="isAddExistingVehiclesOpen" type="boolean" default="false"/>
+    <aura:attribute name="isAssignDealerOpen" type="boolean" default="false"/>
+    <aura:attribute name="isScheduleTestdriveOpen" type="boolean" default="false"/>
+    <aura:attribute name="isUpdateProductInterestOpen" type="boolean" default="false"/>
+    <aura:attribute name="isCloseCallOpen" type="boolean" default="false"/>
+    <aura:attribute name="isRelContactOpen" type="boolean" default="false"/>
+    <aura:attribute name="isOthIntOpen" type="boolean" default="false"/>
+    <aura:attribute name="isPrioritizationOpen" type="boolean" default="false"/>
+    <aura:attribute name="isFetchChatOpen" type="boolean" default="false"/>
+    <aura:attribute name="isDNCOpen" type="boolean" default="false"/>
+     <aura:attribute name="isNewLead" type="Boolean" default="false"/>
+    <aura:attribute name="isReferAFriend" type="Boolean" default="false"/>
+    <aura:attribute name="recordId" type="Id"/>
+    <aura:attribute name="leadRecord" type="Lead"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>  
+    <aura:handler name="clsPopupEvent" event="c:ACE_CloseParentFromChild" action="{!c.closeAddExistingVehiclesModel}"/>
+    <aura:handler name="clsPopupEvent" event="c:ACE_CloseParentFromChild" action="{!c.closeAssignDealerModel}"/>
+    <aura:handler name="clsPopupEventCTD" event="c:ACE_CloseParentFromChild" action="{!c.closeScheduleTestdriveModel}"/>
+    <aura:handler name="clsPopupEvent" event="c:ACE_CloseParentFromChild" action="{!c.closeOthInt}"/>
+    <aura:handler name="modalClose" event="c:ACE_CloseParentFromChild" action="{!c.closeReferAFreind}"/>
+    <aura:handler name="clsPopupEventNewLead" event="c:ACE_CloseParentFromChild" action="{!c.closeNewLead}"/>
+    <aura:handler name="modalClose" event="c:ACE_CloseParentFromChild" action="{!c.closePrioritization}"/>
+
+
+    <aura:attribute name="showExistingVehicle" type="Boolean" default="true"/>
+    <aura:attribute name="showAssignDealer" type="Boolean" default="true"/>
+    <aura:attribute name="showTD" type="Boolean" default="true"/>
+    <aura:attribute name="showCloseCall" type="Boolean" default="true"/>
+    <aura:attribute name="showLinkContact" type="Boolean" default="true"/>
+    <aura:attribute name="showAddCompetitor" type="Boolean" default="true"/>
+    <aura:attribute name="showProductInterest" type="Boolean" default="true"/>
+    <aura:attribute name="showDNC" type="Boolean" default="false"/>
+    <aura:attribute name="showFecthChat" type="Boolean" default="false"/>
+    <aura:attribute name="showReferFreindButton" type="Boolean" default="true"/>
+     <aura:attribute name="showNewLeadButton" type="Boolean" default="true"/>
+    
+    
+    <aura:if isTrue="{!v.showExistingVehicle}">
+        <lightning:button variant="brand" label="Add Existing Vehicles" title="Add Existing Vehicles" onclick="{! c.openAddExistingVehiclesModel }"/>
+    </aura:if>
+    <aura:if isTrue="{!v.showAssignDealer}">
+        <lightning:button variant="brand" label="Assign Dealer" title="Assign Dealer" onclick="{! c.openAssignDealerModel }"/>
+    </aura:if>
+    <aura:if isTrue="{!v.showTD}">
+        <lightning:button variant="brand" label="Schedule Test Drive" title="Schedule Test drive" onclick="{! c.openScheduleTestdriveModel }"/>
+    </aura:if>
+    <aura:if isTrue="{!v.showCloseCall}">
+        <lightning:button variant="brand" label="Close Call" title="Close call" onclick="{! c.openCloseCallModel }"/>
+    </aura:if>
+    <aura:if isTrue="{!v.showLinkContact}">
+        <lightning:button variant="brand" label="Link Contact" title="Link Contact" onclick="{! c.openRelatedContact }"/>
+    </aura:if>
+    <aura:if isTrue="{!v.showAddCompetitor}">
+        <lightning:button variant="brand" label="Add Competition" title="Add Competition" onclick="{! c.openOthInt}"/>
+    </aura:if>
+    <aura:if isTrue="{!v.showProductInterest}">
+        <lightning:button variant="brand" label="Add Product Interests" title="Add Product Interests" onclick="{! c.openPrioritization}"/>
+    </aura:if>
+    <aura:if isTrue="{!v.showDNC}">
+        <lightning:button variant="brand" label="Update DNC" title="Update DNC" onclick="{!c.openDNCModel}"/>
+    </aura:if>
+    <aura:if isTrue="{!v.showFecthChat &amp;&amp; v.leadRecord.SalesIQ_ChatId__c!=null &amp;&amp; v.leadRecord.SalesIQ_ChatId__c!=''}">
+        <lightning:button variant="brand" label="Attach Chat" title="Attach Chat" onclick="{! c.openFetchChat}"/>
+    </aura:if>
+    <aura:if isTrue="{!v.showNewLeadButton}">
+        <lightning:button variant="brand" label="New Lead" title="New lead" onclick="{! c.openNewLead}"/>
+    </aura:if>
+    <aura:if isTrue="{!v.showReferFreindButton}">
+        <lightning:button variant="brand" label="Refer a friend" title="Refer a friend" onclick="{! c.openReferAFreind}"/>
+    </aura:if>
+    <!--   <lightning:button label=" Update Product Interest" title=" Update Product Interest" onclick="{! c.openUpdateProductInterestModel }"/>
+    <lightning:button label="Close call" title="Close call" onclick="{! c.openCloseCallModel }"/> -->
+    
+    <aura:if isTrue="{!v.isAddExistingVehiclesOpen}">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <!-- Modal/Popup Box Header Starts here-->
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close"
+                                          onclick="{! c.closeAddExistingVehiclesModel }"
+                                          alternativeText="close"
+                                          variant="bare-inverse"
+                                          class="slds-modal__close"/>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Add Existing Vehicles</h2>
+                </header>
+                <!--Modal/Popup Box Body Starts here-->
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <c:ACE_ExistingVehicles2></c:ACE_ExistingVehicles2>
+                </div>
+                <!--Modal/Popup Box Footer Starts here
+                <footer class="slds-modal__footer">
+                    <lightning:button variant="neutral"
+                                      label="Cancel"
+                                      title="Cancel"
+                                      onclick="{! c.closeAddExistingVehiclesModel }"/>
+                </footer>-->
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+    <aura:if isTrue="{!v.isAssignDealerOpen}">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <!-- Modal/Popup Box Header Starts here-->
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close"
+                                          onclick="{! c.closeAssignDealerModel }"
+                                          alternativeText="close"
+                                          variant="bare-inverse"
+                                          class="slds-modal__close"/>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Assign Dealer</h2>
+                </header>
+                <!--Modal/Popup Box Body Starts here-->
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <c:ACE_AssignDealer></c:ACE_AssignDealer>
+                </div>
+                <!--Modal/Popup Box Footer Starts here
+                <footer class="slds-modal__footer">
+                    <lightning:button variant="neutral"
+                                      label="Cancel"
+                                      title="Cancel"
+                                      onclick="{! c.closeAssignDealerModel }"/>
+                </footer>-->
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+    <aura:if isTrue="{!v.isScheduleTestdriveOpen}">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <!-- Modal/Popup Box Header Starts here-->
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close"
+                                          onclick="{! c.closeScheduleTestdriveModel }"
+                                          alternativeText="close"
+                                          variant="bare-inverse"
+                                          class="slds-modal__close"/>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Schedule Test Drive</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <c:ACE_ScheduleTestDrive></c:ACE_ScheduleTestDrive>
+                </div>
+                <!--Modal/Popup Box Footer Starts here
+                <footer class="slds-modal__footer">
+                    <lightning:button variant="brand"
+                                      label="Cancel"
+                                      title="Cancel"
+                                      onclick="{! c.closeScheduleTestdriveModel }"/>
+                </footer>-->
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+    <aura:if isTrue="{!v.isUpdateProductInterestOpen}">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <!-- Modal/Popup Box Header Starts here-->
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close"
+                                          onclick="{! c.closeUpdateProductInterestModel }"
+                                          alternativeText="close"
+                                          variant="bare-inverse"
+                                          class="slds-modal__close"/>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Update Product Interest</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <!-- <c:ACE_Product_Interest_Prioritization></c:ACE_Product_Interest_Prioritization> -->
+                </div>
+                <!--Modal/Popup Box Footer Starts here-->
+                <footer class="slds-modal__footer">
+                    <lightning:button variant="neutral"
+                                      label="Cancel"
+                                      title="Cancel"
+                                      onclick="{! c.closeUpdateProductInterestModel }"/>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+    <aura:if isTrue="{!v.isCloseCallOpen}">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <!-- Modal/Popup Box Header Starts here-->
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close"
+                                          onclick="{! c.closeCloseCallModel }"
+                                          alternativeText="close"
+                                          variant="bare-inverse"
+                                          class="slds-modal__close"/>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Close Call</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <c:ACE_MRC_LeadDisposition aura:id="closeCall" recordId="{!v.recordId}"></c:ACE_MRC_LeadDisposition>
+                </div>
+                <!--Modal/Popup Box Footer Starts here-->
+                <footer class="slds-modal__footer">
+                    <lightning:button variant="brand"
+                                      label="Cancel"
+                                      title="Cancel"
+                                      onclick="{! c.closeCloseCallModel }"/>
+                    <lightning:button variant="Brand"
+                                      label="Close Call"
+                                      title="Close Call"
+                                      onclick="{! c.doCloseCall }"/>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+    <aura:if isTrue="{!v.isRelContactOpen}">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <!-- Modal/Popup Box Header Starts here-->
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close"
+                                          onclick="{! c.closeRelatedContact }"
+                                          alternativeText="close"
+                                          variant="bare-inverse"
+                                          class="slds-modal__close"/>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Link Contact</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <c:ACE_CustomerSearch_Component></c:ACE_CustomerSearch_Component>
+                </div>
+                <!--Modal/Popup Box Footer Starts here-->
+                <footer class="slds-modal__footer">
+                    <!-- <lightning:button variant="Brand"
+                                      label="Close Call"
+                                      title="Close Call"
+                                      onclick="{! c.doCloseCall }"/> -->
+                    <lightning:button variant="brand"
+                                      label="Cancel"
+                                      title="Cancel"
+                                      onclick="{! c.closeRelatedContact }"/>
+                </footer>-->
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+    <aura:if isTrue="{!v.isOthIntOpen}">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <!-- Modal/Popup Box Header Starts here-->
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close"
+                                          onclick="{! c.closeOthInt }"
+                                          alternativeText="close"
+                                          variant="bare-inverse"
+                                          class="slds-modal__close"/>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Add Competition </h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <c:ACE_AddOtherInterests></c:ACE_AddOtherInterests>
+                </div>
+                <!--Modal/Popup Box Footer Starts here-->
+                <!--<footer class="slds-modal__footer">
+                    <lightning:button variant="Brand"
+                                      label="Close Call"
+                                      title="Close Call"
+                                      onclick="{! c.doCloseCall }"/> 
+                    <lightning:button variant="brand"
+                                      label="Cancel"
+                                      title="Cancel"
+                                      onclick="{! c.closeOtherInt }"/> 
+                </footer> -->
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+    <aura:if isTrue="{!v.isPrioritizationOpen}">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <!-- Modal/Popup Box Header Starts here-->
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close"
+                                          onclick="{! c.closePrioritization }"
+                                          alternativeText="close"
+                                          variant="bare-inverse"
+                                          class="slds-modal__close"/>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Add Product Interests </h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <c:ACE_Product_Interest_Prioritization></c:ACE_Product_Interest_Prioritization>
+                </div>
+                <!--Modal/Popup Box Footer Starts here
+               <footer class="slds-modal__footer">
+                     <lightning:button variant="Brand"
+                                      label="Close Call"
+                                      title="Close Call"
+                                      onclick="{! c.doCloseCall }"/>  
+                    <lightning:button variant="brand"
+                                      label="Cancel"
+                                      title="Cancel"
+                                      onclick="{! c.closePrioritization }"/> 
+                </footer> -->
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.isFetchChatOpen &amp;&amp; v.leadRecord.SalesIQ_ChatId__c!=null &amp;&amp; v.leadRecord.SalesIQ_ChatId__c!=''}">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <!-- Modal/Popup Box Header Starts here-->
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close"
+                                          onclick="{! c.closeFetchChat }"
+                                          alternativeText="close"
+                                          variant="bare-inverse"
+                                          class="slds-modal__close"/>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Attach SalesIQ Chat Transcripts </h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <c:ACE_AttachChatTranscript parentRecId="{!v.recordId}" chatSiqId="{!v.leadRecord.SalesIQ_ChatId__c}"
+                                                phoneNum="{!v.leadRecord.MobilePhone}"/>
+                </div>
+                <!--Modal/Popup Box Footer Starts here
+               <footer class="slds-modal__footer">
+                    <lightning:button variant="brand"
+                                      label="Cancel"
+                                      title="Cancel"
+                                      onclick="{! c.closePrioritization }"/> 
+                </footer> -->
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+    <aura:if isTrue="{!v.isDNCOpen}">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <!-- Modal/Popup Box Header Starts here-->
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close"
+                                          onclick="{! c.closeDNCModel }"
+                                          alternativeText="close"
+                                          variant="bare-inverse"
+                                          class="slds-modal__close"/>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Update DNC</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <c:ACE_DNC aura:id="cDNC" recordId="{!v.recordId}"></c:ACE_DNC>
+                </div>
+                <!--Modal/Popup Box Footer Starts here-->
+                <footer class="slds-modal__footer">
+                    <lightning:button variant="brand"
+                                      label="Cancel"
+                                      title="Cancel"
+                                      onclick="{! c.closeDNCModel }"/>
+                    <lightning:button variant="Brand"
+                                      label="Update DNC"
+                                      title="Update DNC"
+                                      onclick="{! c.updateDNC }"/>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+    <aura:if isTrue="{!v.isNewLead}">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <!-- Modal/Popup Box Header Starts here-->
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close"
+                                          onclick="{! c.closeNewLead }"
+                                          alternativeText="close"
+                                          variant="bare-inverse"
+                                          class="slds-modal__close"/>
+                </header>
+                <!--Modal/Popup Box Body Starts here-->
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <c:ACE_Lead_RelatedList/>
+                </div>
+                <!--Modal/Popup Box Footer Starts here
+                <footer class="slds-modal__footer">
+                    <lightning:button variant="neutral"
+                                      label="Cancel"
+                                      title="Cancel"
+                                      onclick="{! c.closeAddExistingVehiclesModel }"/>
+                </footer>-->
+            </div>
+        </section>
+          <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+    <lightning:overlayLibrary aura:id="overlayLib"/>
+    <aura:if isTrue="{!v.isReferAFriend}">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <!-- Modal/Popup Box Header Starts here-->
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close"
+                                          onclick="{! c.closeReferAFreind }"
+                                          alternativeText="close"
+                                          variant="bare-inverse"
+                                          class="slds-modal__close"/>
+                    <h2 id="modal-heading-01" class="slds-text-heading_large slds-hyphenate">Refer a Friend</h2>
+                </header>
+                <!--Modal/Popup Box Body Starts here-->
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <c:ACE_NewCustomers/>
+                </div>
+            </div>
+        </section>
+          <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+</aura:component>

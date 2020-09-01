@@ -1,0 +1,166 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:attribute name="isModalOpen" type="boolean" default="false"/>
+    <aura:attribute name="isSlotSelected" type="boolean" default="false"/>
+    <!--<aura:attribute name="allData" type="String[]" />-->
+    <!--<aura:attribute name="timeSheet" type="String[]" />-->
+    <aura:attribute name="allData" type="List" />
+    <aura:attribute name="timeSheet" type="List" />
+    <aura:attribute name="minDate" type="String" />
+    <aura:attribute name="maxDate" type="String" />
+    <aura:attribute name="dateSelected" type="String" />
+    <aura:attribute name="slotVal" type="String" />
+    <aura:attribute name="hubVal" type="String" />
+    <aura:attribute name="selSlotCell" type="String" />
+    <aura:attribute name="disableSlotsMap" type="Map" />
+    <aura:handler name="slotEvt" event="c:ScheduleTD_SlotEvt" action="{!c.slotClicked}" includeFacets="true" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:registerEvent name="linkObjEvt" type="c:ACE_LinkSObjectEvent"/>
+    <aura:html tag="style">
+        .myCal{
+        min-height:44px !important;
+        }
+        .iconLens {
+        margin-top:20px;
+        margin-bottom:6px;
+        margin-left:10px;
+        width: 45px;
+        color: white !important;
+        background-color: #e53144;
+        }
+        .selVals{
+        margin-top: 24px;
+        }
+        .disableSlot{
+        background-color:#bcbcbc;
+        }
+        .clickSlot{
+        background-color:darkorange;
+        }
+        .slotCell { vertical-align:middle;horizontal-align:center; }
+        .slotCell:hover {background-color:darkorange; }
+        .slotCell:focus {background-color:chocolate; }
+        .slotCell:active {background-color:chocolate; }
+        .slotCell:click {background-color:yellow; color:blue;}
+        .selected{
+        background-color:#33ccff !important;
+        /*border: 3px solid rgb(0, 112, 210);#0099ff*/
+        }
+    </aura:html>
+    <lightning:card class="scrollit " >
+        <ul class="slds-list_horizontal slds-has-block-links_space">
+            <li>
+                <lightning:input type="date" name="input1" label="Select a date" placeholder="enter..."
+                                 value="{!v.dateSelected}" class="dateSelecter myCal"
+                                 min="{!v.minDate}" max="{!v.maxDate}" onchange="{!c.isValidDate}"/>
+            </li>
+            <li><!--goButton-->
+                <lightning:buttonIcon iconName="utility:search" variant="brand" class="iconLens" 
+                                      alternativeText="Search Available Test Drive Slots"
+                                      onclick="{! c.searchSlots }" />
+            </li>
+            <li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</li>
+            <li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</li>
+            <aura:if isTrue="{!v.isSlotSelected}">
+                <li>
+                    <h5 class="selVals">Vehicle Hub : {!v.hubVal}</h5>
+                </li>
+                <li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</li>
+                <li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</li>
+                <li>
+                    <h5 class="selVals">Time Slot : {!v.slotVal}</h5>
+                </li>
+            </aura:if>           
+        </ul>
+        
+        <table id="customers">
+            <tr>
+                <aura:iteration items="{!v.allData}" var="item" indexVar="index">
+                    <th class="dealerData">
+                        <aura:if isTrue="{!index == 0}">
+                            <h1 style="text-align:center;">Time Slots</h1><!--max-width:130px;-->
+                            <aura:set attribute="else">
+                                <h1 style="text-align: center;">Hub {!index}</h1>
+                            </aura:set>
+                        </aura:if>
+                    </th>
+                </aura:iteration>
+            </tr>
+            <aura:iteration items="{!v.timeSheet}" var="itemTime" indexVar="timeIdx" aura:id="tabTime1" >
+                <tr>
+                    <aura:iteration items="{!v.allData}" var="item" indexVar="index" aura:id="tabTime2" >
+                        <td>
+                            <aura:if isTrue="{!index == 0}">
+                                <h1 class="time_data">{!itemTime.key}</h1><!--{!itemTime}-->
+                                <aura:set attribute="else">
+                                    <!--disableSlotsMap.c.chkRowColEnblDsbl(index==5&amp;&amp;timeIdx==3)||(index==2&amp;&amp;timeIdx==2)-->
+                                    <c:auraIfContains items="{!item.booked}" element="{!';'+itemTime.key+';'}" checkCaseSensitivity="false">
+                                        <div class="disableSlot" title="Slot Unavailable For Booking">
+                                            <lightning:icon iconName="utility:dash" disabled="true" style="margin-left:40%;"
+                                                            class="slds-icon slds-icon_small" size="xx-small" />
+                                        </div>
+                                    </c:auraIfContains>
+                                    <c:auraIfContains items="{!item.booked}" element="{!';'+itemTime.key+';'}" checkCaseSensitivity="false" chkIfNotContains="true">
+                                        <c:ScheduleTD_Slot row="{!itemTime.key}" col="{!index}" selected="{!itemTime.key+'_'+index == v.selSlotCell ? true : false}" />
+                                    </c:auraIfContains>
+                                    <!--<aura:if isTrue="{!itemTime.value==false &amp;&amp; item.value==false}">
+                                        <div class="disableSlot" title="Slot Unavailable For Booking">
+                                            <lightning:icon iconName="utility:dash" disabled="true" style="margin-left:40%;"
+                                                            class="slds-icon slds-icon_small" size="xx-small" />
+                                        </div>
+                                        <aura:set attribute="else">
+                                            <c:ScheduleTD_Slot row="{!itemTime.key}" col="{!index}" selected="{!itemTime.key+'_'+index == v.selSlotCell ? true : false}" />
+                                            <!-.-<div class="{!v.selected ? 'slotCell selected' : 'slotCell' }">variant="inverse"
+                                                <!-.-<lightning:button label="+" title="+" onclick="{! c.openModel }"
+                                                          id="{!itemTime+''+item}" class="addTestDrive" / slds-button_desctructive-.->
+                                                <a onclick="{!c.openModel}" id="{!itemTime+'_'+index}" style="margin-left: 40%;" class="addTestDrive">
+                                                    <lightning:icon iconName="utility:add" variant="error" class="slds-icon slds-icon_small" size="xx-small" alternativeText="add"/>
+                                                    <span class="slds-assistive-text">Add Icon</span>
+                                                </a>
+                                            </div>-.->
+                                        </aura:set>
+                                    </aura:if>-->
+                                </aura:set>
+                            </aura:if>
+                        </td>
+                    </aura:iteration>
+                </tr>
+            </aura:iteration>
+        </table>
+    </lightning:card>
+    <!--Use aura:if tag to display/hide popup based on isModalOpen value-->  
+    <aura:if isTrue="{!v.isModalOpen}">
+        
+        <!-- Modal/Popup Box starts here-->
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <!-- Modal/Popup Box Header Starts here-->
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close"
+                                          onclick="{! c.closeModel }"
+                                          alternativeText="close"
+                                          variant="bare-inverse"
+                                          class="slds-modal__close"/>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Modal/PopUp Box</h2>
+                </header>
+                <!--Modal/Popup Box Body Starts here-->
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <p><b>Modals/Popup Box are used to display content in a layer above the app. This paradigm is used in cases such as the creation or editing of a record, as well as various types of messaging and wizards.
+                        </b>
+                    </p>
+                </div>
+                <!--Modal/Popup Box Footer Starts here-->
+                <footer class="slds-modal__footer">
+                    <lightning:button variant="neutral"
+                                      label="Cancel"
+                                      title="Cancel"
+                                      onclick="{! c.closeModel }"/>
+                    <lightning:button variant="brand"
+                                      label="OK"
+                                      title="OK"
+                                      onclick="{!c.submitDetails}"/>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+</aura:component>

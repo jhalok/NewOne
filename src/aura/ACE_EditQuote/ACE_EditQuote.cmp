@@ -1,0 +1,20 @@
+<aura:component
+implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader"
+access="global"
+controller="GenerateQuoteController"
+>
+<aura:attribute name="renderChild" type="boolean" default="false" />
+<aura:attribute name="recordId" type="String" />
+<aura:attribute name="oppId" type="String" />
+<aura:attribute name="defaultMap" type="Map" />
+<aura:attribute name="quoteCharges" type="Quote" default="{'sobjectType': 'Quote'}" />
+<!--aura:attribute name="beforeSaveQuote" type="Quote"  /-->
+<aura:attribute name="beforeSaveQuote" type="List"  /> <!--Added on 18-12-2019-->
+
+<aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+<aura:if isTrue="{!v.renderChild}">
+    <c:GenerateQuote recordId="{!v.oppId}" isEdit="true" 
+    defaultMap="{!v.defaultMap}" quoteCharges="{#v.quoteCharges}" 
+    quoteId = "{#v.recordId}" beforeSaveQuote="{#v.beforeSaveQuote}" />
+</aura:if>
+</aura:component>

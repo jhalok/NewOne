@@ -1,0 +1,198 @@
+<aura:component controller="ACE_AccountSearch" implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" access="global" >
+    
+    <aura:attribute name="relatedContactDetails" type="object"  />
+    <aura:attribute name="searchResult" type="List" description="use for store and display account list return from server"/>
+    <aura:attribute name="recordMultiList" type="List" description="used for display accordion list"/>
+    <aura:attribute name="showMultiList" type="Boolean" default="true"/>
+    <aura:attribute name="columns" type="Object"/>
+   
+    <aura:attribute name="isInboundSide" type="boolean"/>
+    <aura:attribute name="selectedAccount" type="String" />
+    <aura:attribute name="searchOptions" type="List" default="[
+                                                              {'label': 'Mobile', 'value': 'mobile'},
+                                                              {'label': 'Email', 'value': 'email'},
+                                                              {'label': 'Customer Id', 'value': 'customerId'},
+                                                              {'label': 'Vehicle Reg. No.', 'value': 'vehicleno'},
+                                                              {'label': 'Chassis No.', 'value': 'chasisno'},
+                                                              {'label': 'RO Id', 'value': 'roid'}]"/>
+    <aura:attribute name="searchOptionValue" type="String" default="mobile"/>
+    <aura:attribute name="searchText" type="String"/>
+    <aura:attribute name="Message" type="boolean" default="false" description="use for display no record found message"/>
+    <aura:attribute name="SelectMessage" type="boolean" default="false" description="use for display selected record message"/>
+    <aura:attribute name="isLinked" type="boolean" default="false"/>
+    <!--Added by Sanchayan...Start-->
+    <lightning:workspaceAPI aura:id="workspace"/>
+    <aura:attribute name="hdrName" type="String" default="Customer Search"/>
+    <aura:attribute name="iconName" type="String" default="standard:search"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" description="Init page load"/>
+    <!--Added by Sanchayan...End-->
+    <aura:method name="searchRecords" action="{!c.Search}" access="PUBLIC"/>
+    <aura:registerEvent name="linkObjEvt" type="c:ACE_LinkSObjectEvent"/>
+    <aura:registerEvent name="relatedContact" type="c:ACE_AssignContact"/>
+    <!-- SHOW LOADING SPINNER--> 
+    <div class="slds-is-releative">
+        <lightning:spinner variant="brand" size="large" aura:id="Id_spinner" class="slds-hide" />
+    </div>
+    
+    <aura:html tag="style">
+        .iconLens {
+        margin-top:20px;
+        margin-bottom:6px;
+        margin-left:10px;
+        width: 45px;
+        color: white !important;
+        background-color: #e53144;
+        }
+    </aura:html>
+    <!-- SEARCH INPUT AND SEARCH BUTTON-->
+    
+    <lightning:card title="{!v.hdrName}"  iconName="{!v.iconName}">
+        
+        <div class="slds-grid slds-wrap">
+            <div class="slds-col slds-size_2-of-4" style="margin-left:15px;">
+                <aura:if isTrue="{!v.searchOptionValue == 'email'}">
+                    <lightning:input aura:id="searchField" type='email' label="Email" value="{!v.searchText}" placeholder="yourname@domain.com"/>
+                    <aura:set attribute="else">
+                        <aura:if isTrue="{!v.searchOptionValue == 'mobile'}">
+                            <lightning:input aura:id="searchField" pattern="[0-9]{10}" label="Mobile" value="{!v.searchText}" placeholder="Enter mobile number" />    
+                            <aura:set attribute="else">
+                                <aura:if isTrue="{!v.searchOptionValue == 'customerId'}">
+                                    <lightning:input aura:id="searchField" value="{!v.searchText}" placeholder="Enter Customer Id" label="Customer Id" type='text'/>
+                                    <aura:set attribute="else">
+                                        <aura:if isTrue="{!v.searchOptionValue == 'vehicleno'}">
+                                            <lightning:input aura:id="searchField" value="{!v.searchText}" placeholder="Enter vehicle Registration number like MH01AB6890" label="Vehicle Registration Number" type='text'/>
+                                            <aura:set attribute="else">
+                                                <aura:if isTrue="{!v.searchOptionValue == 'chasisno'}">
+                                                	<lightning:input aura:id="searchField" value="{!v.searchText}" placeholder="Enter chassis number" label="Chassis Number" type='text'/>
+                                                    	<aura:set attribute="else">
+                                                    		<lightning:input aura:id="searchField" value="{!v.searchText}" placeholder="Enter Repair Order id" label="RO Id" type='text'/>
+                                                    	</aura:set>  
+                                                </aura:if>    
+                                            </aura:set>
+                                        </aura:if>
+                                    </aura:set>
+                                </aura:if>
+                            </aura:set>
+                        </aura:if>
+                    </aura:set>
+                </aura:if>
+            </div>
+            <div class="slds-col slds-size_1-of-4" >
+               <!--style="padding-top: 20px;padding-left: 20px;"<lightning:button onclick="{!c.Search}" variant="brand" label="" iconName="utility:search"/>-->
+                <lightning:buttonIcon iconName="utility:search" variant="brand" class="iconLens" 
+                                      alternativeText="Search Customer" onclick="{!c.Search }" />
+            </div>
+        </div>
+        
+        <lightning:radioGroup name="searchCategory"
+                              label="Search Category:"
+                              options="{! v.searchOptions }"
+                              value="{! v.searchOptionValue }"
+                              type="radio"
+                              class=" slds-p-around_medium"/>
+    </lightning:card>
+    
+    <!-- USE TO DISPLAY SELECTED RECORD MESSAGE-->
+    <aura:if isTrue="{!v.SelectMessage}">
+        <div class= "slds-align_absolute-center" style="height:3rem;width:25rem">
+            <div class="slds-region_narrow  slds-is-relative">
+                <div class="slds-notify slds-notify_toast slds-theme_success" role="status">
+                    <div class="slds-align_absolute-center">
+                        <h2 >  {!v.selectedAccount}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </aura:if>
+    
+    <!-- USE TO DISPLAY  ACCOUNT LIST RETURN FORM SERVER IN A TABLE FORMAT-->
+    <aura:if isTrue="{! !v.showMultiList &amp;&amp; v.searchResult.length > 0}">
+        <table class="slds-table slds-table_bordered slds-table--header-fixed slds-m-top_medium">
+            <thead>
+                <tr class="slds-text-title_caps" >
+                    <th style = "text-align:center;">
+                        Name
+                       
+                    </th>
+                    <th style = "text-align:center;">
+                        Action
+                    </th>
+                </tr>
+            </thead>
+            <aura:iteration items="{!v.searchResult}" var="item">
+                <tr>
+                    <td style = "text-align:center;">
+                        <a href="{!item.URL}" >{!item.Name}</a>
+                        </td>
+                    <td style = "text-align:center;">
+                     <!--   <a onclick="{!c.linkContact}" id="{!item.Id}" >Link Contact</a> -->
+                        
+                        <button type="button"  class="slds-button slds-button_brand slds-m-around_small" onclick="{!c.linkContact}" id="{!item.Id}" variant="brand" label="" value="{!item.Name}" iconName="utility:link">Link Contact</button>
+                        
+                    </td>
+                </tr>
+            </aura:iteration>
+            
+        </table>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.showMultiList &amp;&amp; v.recordMultiList.length > 0}" >
+        <lightning:card>
+            <div style="margin-left:15px;">
+                <h1><strong>Search Results</strong></h1>
+                <lightning:accordion >
+                    <aura:iteration items="{!v.recordMultiList}" var="idx">
+                        <lightning:accordionSection name="{!idx.objName}" label="{!idx.objName+' ['+idx.soList.length+']'}">
+                            <table class="slds-table slds-table_bordered slds-table--header-fixed">
+                                <thead>
+                                    <tr class="slds-text-title_caps" >
+                                        <th style="text-align:center;">Name</th>
+                                        <th style="text-align:center;">Action</th>
+                                    </tr>
+                                </thead>
+                                <aura:iteration items="{!idx.soList}" var="itemSo">
+                                    <tr>
+                                        <td style="text-align:center;">
+                                            <!--<lightning:button variant="base" label="{!itemSo.Name}" title="Open record detail" 
+                                                              onclick="{!c.openLinkedRecordTab}" class="slds-m-left_x-small"/>-->
+                                            <a href="" id="{!itemSo.Id}" onclick="{!c.openLinkedRecordTab}">{!itemSo.Name}</a>
+                                        </td>
+                                        <td style="text-align:center;">
+                                            <aura:if isTrue="{!idx.objName=='Contact'}">
+                                                <button type="button" onclick="{!c.linkContactToChatForm}" id="{!itemSo.Id+'_'+itemSo.Name}" variant="brand" 
+                                                        label=" " iconName="utility:link" class="slds-button slds-button_brand">
+                                                    Link Contact
+                                                </button>
+                                            </aura:if>
+                                            <aura:if isTrue="{!idx.objName=='Lead'}">
+                                                <button type="button" onclick="{!c.linkLeadToChatForm}" id="{!itemSo.Id+'_'+itemSo.Name}" variant="brand" 
+                                                        label=" " iconName="utility:link" class="slds-button slds-button_brand">
+                                                    Link Lead
+                                                </button>
+                                            </aura:if>
+                                        </td>
+                                    </tr>
+                                </aura:iteration>
+                                
+                            </table>
+                        </lightning:accordionSection>
+                    </aura:iteration>
+                </lightning:accordion>
+            </div>
+        </lightning:card>
+    </aura:if>
+    
+    <!-- ERROR MESSAGE IF NOT RECORDS FOUND--> 
+    <aura:if isTrue="{!v.Message}">
+        <div class= "slds-align_absolute-center" style="height:3rem;width:25rem">
+            <div class="slds-region_narrow  slds-is-relative">
+                <div class="slds-notify slds-notify_toast slds-theme_error" role="alert">
+                    <div class="slds-align_absolute-center">
+                        <h2 > No Record Found</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </aura:if>
+    
+</aura:component>

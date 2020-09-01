@@ -1,0 +1,329 @@
+<aura:component controller="ACE_CreateAndUpdateAnAgent" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:attribute name="searchResult" type="list" description="use for store and display user list return from server"/>
+    <aura:attribute name="spinner" type="string" default="display:none;" />
+    <aura:attribute name="searchBy" type="string"  />
+    <aura:attribute name="valueInPlaceHolder" type="string" default="Enter the Agent Name" />
+    <aura:attribute name="searchOn" type="string"  default="Name"  />
+    <aura:attribute name="isUserCreateOpen" type="boolean"  default="false"  />
+    <aura:attribute name="isBulkUserOpen" type="boolean"  default="false"  />
+    <aura:attribute name="searchStatus" type="string"  default="All"  />
+    <aura:attribute name="isAllSelected" type="boolean" default="false" />
+    <aura:attribute name="allServiceList" type="List" />  
+    <aura:attribute name="userName" type="string" />
+    <aura:attribute name="selected" type="List"    />
+    <aura:attribute name="dataLength" type="boolean" default="false" />
+    <aura:attribute name="AllRecord" type="List" />
+    <aura:attribute name="newUser" type="sobject" default="{'sobjectType': 'User',
+                                                           'FirstName': '',
+                                                           'LastName': '',
+                                                           'Email': '',
+                                                           'IsActive': false,
+                                                           'CallCenterId': '',
+                                                           'UserRoleId': '',
+                                                           'Team__c ': '',
+                                                           'Username ' : '',
+                                                           }"/>
+    
+    <aura:attribute name="allUserRole" type="UserRole[]"  />
+    <aura:attribute name="callCenter" type="CallCenter"  />
+    <aura:attribute name="team" type="string[]"  />
+     <aura:attribute name="ServiceId" type="string"  />
+    
+    <aura:attribute name = "pageSize" type = "Integer" default  = "5"/>
+    <aura:attribute name = "allRecords" type = "object"/>
+    <aura:attribute name = "tatalPage" type = "Integer"/>
+    <aura:attribute name = "pageNo" type = "Integer" default = "1"/>
+    <aura:attribute name = "totalRecords" type = "Integer" />  
+    <aura:attribute name = "data" type = "object"/>
+    <aura:attribute name = "RecordPerPage" type = "List"/>
+    <aura:attribute name = "firstshow" type="Boolean" default="false"/>
+    <aura:attribute name = "previousshow" type="Boolean" default="false"/>
+    <aura:attribute name = "nextshow" type="Boolean" default="false"/>
+    <aura:attribute name = "lastshow" type="Boolean" default="false"/>
+    <aura:attribute name = "show" type="Boolean" default="true"/>
+    <aura:attribute name = "Methodrun" type = "Boolean" default="true"/>
+    <aura:attribute name = "first1" type="Integer" />
+    <aura:attribute name = "previous1" type="Integer" />
+    <aura:attribute name = "middle" type="Integer" />
+    <aura:attribute name = "next1" type="Integer" />
+    <aura:attribute name = "Last1" type="Integer" />
+    <aura:attribute name = "selection" type = "List" default="[]"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <lightning:layout >
+        <lightning:layoutItem size="12" mediumDeviceSize="12" largeDeviceSize="12" flexibility="auto">
+            <lightning:card >
+                <div style="{!v.spinner}" >
+                    <div class="demo-only demo--inverse" style="height:6rem;">
+                        <div class="slds-spinner_container">
+                            <div role="status" class="slds-spinner slds-spinner_medium">
+                                <span class="slds-assistive-text">Loading</span>
+                                <div class="slds-spinner__dot-a"></div>
+                                <div class="slds-spinner__dot-b"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <table style="width: 46%;margin: auto" >
+                    <tr >
+                        <th class="searchSection" style="padding-left: 30px;"> <h5 style="float:left; margin-top: 6px;"><b>Search</b></h5> <lightning:input class="dataForSearch" placeholder="{!v.valueInPlaceHolder}" aura:id="searchBy" value="{!v.searchBy}" name="searchBy" label="Search By" /></th>
+                        <th class="searchSection" > 
+                            <h5 style="float:left; margin-top: 6px;"><b>Status</b></h5>
+                            <lightning:select  name="select1" label="" class="statusForSearch" value="{!v.searchStatus}" >
+                                <option value="">All</option>
+                                <option value="true">Active</option>
+                                <option value="false">Inactive</option>
+                            </lightning:select>
+                        </th>
+                        <th class="searchSection" ><lightning:button variant="brand" label="Search" title="Search" onclick="{! c.searchUser }" />
+                        </th>
+                        <th></th>
+                    </tr>
+                    <tr>
+                        <td style="padding-left: 11%;padding-bottom:30px;padding-top:20px;">
+                            <span style="    float: left;"><lightning:input onchange="{!c.onGroup}" type="radio" label="Name" name="search" value="Name" checked="true"/></span>
+                            <span style="    float: left;"><lightning:input onchange="{!c.onGroup}" type="radio" label="DealerId" name="search" value="Dialer_User_ID__c "/></span>
+                            <span style="    float: left;"><lightning:input onchange="{!c.onGroup}" type="radio" label="Team" name="search" value="Team__c"/></span>
+                            <span style="    float: left;"><lightning:input onchange="{!c.onGroup}" type="radio" label="Service" name="search" value="Service__c"/></span>
+                        </td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </table>
+                <div style="height: 43px;padding-right: 20px;">
+                    <lightning:button variant="brand" label="Reset Password" title="Reset Password" onclick="{! c.ResetPassword }" class="userCreationBution resetButton" />
+                    <lightning:button variant="brand" label="Update" title="Update" onclick="{! c.updateData }" class="userCreationBution" />
+                    <lightning:button variant="brand" label="Bulk Upload" title="Bulk Upload" onclick="{! c.openBulkUser}" class="userCreationBution" />
+                    <lightning:button variant="brand" label="New User" title="New User" onclick="{! c.openUserCreate }" class="userCreationBution" />
+                    
+                    
+                    
+                </div>
+                <aura:if isTrue="{!v.isUserCreateOpen}">
+                    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                        <div class="slds-modal__container">
+                            <!-- Modal/Popup Box Header Starts here-->
+                            <header class="slds-modal__header">
+                                <lightning:buttonIcon iconName="utility:close"
+                                                      onclick="{! c.closeUserCreate }"
+                                                      alternativeText="close"
+                                                      variant="bare-inverse"
+                                                      class="slds-modal__close"/>
+                                <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Create An Agent</h2>
+                            </header>
+                            <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                                
+                                <table style="width:100%" class="createUser">
+                                    <tr>
+                                        <td> 
+                                            <lightning:input name="FirstName"  aura:id="FirstName"  label="First Name" type="text" value="{!v.newUser.FirstName}" onchange="{!c.createUserName}" />
+                                        </td>
+                                        <td> 
+                                            <lightning:input name="LastName" aura:id="LastName" type="text"  label="Last Name" value="{!v.newUser.LastName}" onchange="{!c.createUserName}" />
+                                        </td>
+                                        <td style="display: none;"> 
+                                            <lightning:input name="CallCenterId" aura:id="CallCenterId" type="text" label="Call Center" disabled="true" value="{!v.callCenter.Name}"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        
+                                        <td> 
+                                            <lightning:select name="UserRole" label="User Role" value="{!v.newUser.UserRoleId}">
+                                                <option value="">choose one...</option>
+                                                <aura:iteration items="{!v.allUserRole}" var="role" indexVar="roleindex" >
+                                                    <option value="{!role.Id}">{!role.Name}</option>
+                                                </aura:iteration>
+                                            </lightning:select>
+                                        </td>
+                                        <td  > 
+                                            <lightning:input name="Username" label="User Name" type="text" value="{!v.userName}" disabled="true"  />
+                                        </td>
+                                    </tr>
+                                    
+                                    <tr>
+                                        <td  > 
+                                            <lightning:select name="Team__c" label="Team" value="{!v.newUser.Team__c }">
+                                                <option value="">choose one...</option>
+                                                <aura:iteration items="{!v.team}" var="team" indexVar="teamindex" >
+                                                    <option value="{!team}">{!team}</option>
+                                                </aura:iteration>
+                                                
+                                            </lightning:select>
+                                        </td>
+                                        <td  style="padding-top: 23px !important;padding-left: 24px !important;"> 
+                                            <lightning:select name="select1" class="" label="Service" value="{!v.ServiceId}">
+                                                <option value="">choose one...</option>
+                                                <aura:iteration items="{!v.allServiceList}" var="item">
+                                                    <option value="{!item.Id}">{!item.Name}</option>
+                                                </aura:iteration>
+                                            </lightning:select>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <!--Modal/Popup Box Footer Starts here -->
+                            <footer class="slds-modal__footer">
+                                <lightning:button variant="brand"
+                                                  label="Cancel"
+                                                  title="Cancel"
+                                                  onclick="{! c.closeUserCreate }"/> 
+                                <lightning:button class="" 
+                                                  variant="brand" 
+                                                  label="Create New" 
+                                                  title="Create New" 
+                                                  onclick="{! c.createUser }" />
+                            </footer>
+                        </div>
+                    </section>
+                    <div class="slds-backdrop slds-backdrop_open"></div>
+                </aura:if>
+                <aura:if isTrue="{!v.isBulkUserOpen}">
+                    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                        <div class="slds-modal__container" Style= "max-width: fit-content;width: max-content;">
+                            <!-- Modal/Popup Box Header Starts here-->
+                            <header class="slds-modal__header">
+                                <lightning:buttonIcon iconName="utility:close"
+                                                      onclick="{! c.closeBulkUser }"
+                                                      alternativeText="close"
+                                                      variant="bare-inverse"
+                                                      class="slds-modal__close"/>
+                                <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Bulk Creation Users</h2>
+                            </header>
+                            <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1" >
+                                <c:Bulk_Creation_Users />
+                            </div>
+                            <!--Modal/Popup Box Footer Starts here-->
+                            <footer class="slds-modal__footer">
+                                <!--  <lightning:button variant="Brand"
+                                                  label="Close Call"
+                                                  title="Close Call"
+                                                  onclick="{! c.saveBulkUser }"/>  --> 
+                                <lightning:button variant="brand"
+                                                  label="Cancel"
+                                                  title="Cancel"
+                                                  onclick="{! c.closeBulkUser }"/> 
+                            </footer> 
+                        </div>
+                    </section>
+                    <div class="slds-backdrop slds-backdrop_open"></div>
+                </aura:if>
+                <div>
+                    <div class="slds-p-top_medium" style = "padding: 1%;">
+                        <div style="overflow-y : scroll;max-height: 354px;" >
+                            <table style="width:100%; height:auto;"  class="  slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered fixed_header">
+                                <thead>
+                                    <tr class="slds-line-height_reset userTableHead">
+                                        <th class="" style="padding:5px;" scope="col">S.No</th>
+                                        
+                                        <th>
+                                            <lightning:input type="checkbox" label="" name="mainOptions" aura:id="allSelect" value="{!v.isAllSelected}" id="allSelect" checked="{!v.isAllSelected}" onchange="{!c.getChecked}"/>
+                                            <!--<input type="checkbox" name="mainOptions" id="allSelect"  value="{!v.isAllSelected}" onchange="{!c.getChecked}" />--></th>
+                                        <th class="" style="text-align: left;" scope="col">Name</th>
+                                        <th class="" style="text-align: left;" scope="col">Username</th>
+                                        <th class=""  scope="col">Service</th>
+                                        <th class="" scope="col">Service Code</th>
+                                        <th class="" scope="col">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <aura:iteration items="{!v.data}" var="searchitem" indexVar="index">
+                                        <tr class="slds-hint-parent userTableTh">
+                                            <td style="width: 30px;padding:5px; text-align: center;">{!index+1}</td>
+                                            <th  style="width: 30px;padding:5px;">
+                                                <!--  <lightning:input type="checkbox" label="" name="options" aura:id="allSelect" value="{!searchitem.selected}" id="{!index}" checked="{!searchitem.selected}" onchange="{!c.getCheckedRow}"/>-->
+                                                
+                                                <div class="slds-media__body">
+                                                    <div class="slds-media">
+                                                        <div class="slds-media__figure">
+                                                            <label class="slds-checkbox" for="{!index}">
+                                                                <input  type="checkbox" name="options" id="{!index}" value="{!searchitem.selected}" checked="{!searchitem.selected}" onchange="{!c.getCheckedRow}"  />
+                                                                <span class="slds-checkbox--faux"></span>
+                                                                <span class="slds-form-element__label slds-assistive-text">mark-complete</span>
+                                                            </label>
+                                                        </div>
+                                                        <div class="slds-media__body">
+                                                            <p class="slds-section-title slds-truncate"><a href="#"></a></p>
+                                                        </div>
+                                                    </div>
+                                                </div> 
+                                            </th> 
+                                            <td >{!searchitem.userData.Name}</td>
+                                            <td>{!searchitem.userData.Username}</td>
+                                            <td  style="padding:5px;">
+                                                <lightning:select  name="select1" class="hideLabel" value="{!searchitem.userService.Lookup_To_Service__c}" onchange="{!c.changeService}" >
+                                                    <option value="">choose one...</option>
+                                                    <aura:iteration items="{!v.allServiceList}" var="item">
+                                                        <option value="{!item.Id}">{!item.Name}</option>
+                                                    </aura:iteration>
+                                                </lightning:select>
+                                            </td>
+                                            <td  style="width: 30px;padding:5px;">
+                                                <!--<lightning:select  name="select1" class="hideLabel" value="{!searchitem.userService.Lookup_To_Service__r.Name}">
+                                                    <option value="">choose one...</option>
+                                                    <aura:iteration items="{!v.allServiceList}" var="item">
+                                                        <option value="{!item.Service_Code__c}">{!item.Service_Code__c}</option> 
+                                                    </aura:iteration>
+                                                </lightning:select>-->
+                                                {!searchitem.userService.Lookup_To_Service__r.Service_Code__c}
+                                            </td>
+                                            <td class="selectStatus"  style="width: 30px;padding:5px;">
+                                                
+                                                <select id="{!index}"  onchange="{!c.changeStatus}">
+                                                    <option value="">choose one...</option>
+                                                    <option  value="true" selected="{!searchitem.userData.IsActive == true}" >Active</option>
+                                                    <option value="false" selected="{!searchitem.userData.IsActive == false}">Inactive</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                    </aura:iteration>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <aura:if isTrue="{!v.dataLength}">
+                        <div class= "slds-align_absolute-center" style="height:3rem;width:25rem">
+                            <div class="slds-region_narrow  slds-is-relative">
+                                <div class="slds-notify slds-notify_toast slds-theme_error" role="alert">
+                                    <div class="slds-align_absolute-center">
+                                        <h2 > No Record Found</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </aura:if> 
+                    
+                    <table>
+                        <tr>
+                            <td style="inline-size: fit-content;">
+                                <lightning:select class ="SelectSize" aura:id="selectpageSize" name="select" label="Record Per Page" onchange="{! c.chagePageSizectrl }">
+                                    <aura:iteration items="{!v.RecordPerPage}" var="Record" >
+                                        <option value="{!Record.label}">{!Record.label}</option>
+                                    </aura:iteration>
+                                </lightning:select>
+                            </td> 
+                            <td style="text-align: center;" >
+                                <div style=" margin-left: 50%;">
+                                    <lightning:button name = "first" label = "First " onclick="{!c.firstPage}" disabled="{!v.firstshow}" />
+                                    <lightning:button name = "previous" label = "Previous" onclick="{!c.previousPage}" disabled="{!v.previousshow}" />
+                                    <lightning:button name = "next" label = "Next" onclick="{!c.nextPage}"  disabled="{!v.nextshow}"/>
+                                    <lightning:button name = "last" label = " Last" onclick="{!c.lastPage}" disabled="{!v.lastshow}"/>
+                                </div>
+                            </td> 
+                            <td>
+                                <div style=" margin-left: 52%;">
+                                <lightning:button aura:id ="1" name = "{!v.first1}" label = "{!v.first1}" onclick="{!c.handlepgbtnclick}" />
+                                <lightning:button aura:id ="2" name = "{!v.previous1}" label = "{!v.previous1}" onclick="{!c.handlepgbtnclick}" />
+                                <lightning:button aura:id ="3" name = "{!v.middle}" label = "{!v.middle}" onclick="{!c.handlepgbtnclick}" />
+                                <lightning:button aura:id ="4" name = "{!v.next1}" label = "{!v.next1}" onclick="{!c.handlepgbtnclick}" />
+                                <lightning:button aura:id ="5" name = "{!v.Last1}" label = "{!v.Last1}" onclick="{!c.handlepgbtnclick}" />
+                                Page No. {!v.pageNo}/{!v.tatalPage}
+                                </div>
+                            </td> 
+                        </tr>
+                    </table>
+                </div>  
+            </lightning:card>
+        </lightning:layoutItem>
+    </lightning:layout>
+</aura:component>

@@ -1,0 +1,80 @@
+<aura:component
+    implements="lightning:isUrlAddressable,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,lightning:actionOverride,forceCommunity:availableForAllPageTypes,force:lightningQuickAction"
+    controller="ACE_WizardController">
+    <aura:attribute name="productInterests" type="List" />
+    <aura:attribute name="showLead" type="boolean" default="true" />
+    <aura:attribute name="showOpp" type="boolean" default="false" />
+    <aura:attribute name="curStep" type="String" default="1" />
+    <aura:attribute name="showProds" type="boolean" default="false" />
+    <aura:attribute name="showSpinner" type="boolean" default="true" />
+    <aura:attribute name="leadFields" type="object" />
+
+    <aura:attribute name="fields" type="object" />
+    <aura:attribute name="enqFields" type="object" />
+
+    <aura:attribute name="navigate" type="boolean" default="true" />
+
+    <aura:handler name="comWizardMessage" event="c:ACE_comWizardMessage" action="{!c.next}" />
+    <aura:html tag="style">
+        .slds-modal__container{
+        max-width: 80rem !important;
+        width:80% !important;
+        }
+    </aura:html>
+    <aura:if isTrue="{! v.showSpinner }">
+
+        <lightning:spinner alternativeText="Loading" variant="brand" />
+    </aura:if>
+    <lightning:progressIndicator currentStep="{!v.curStep}" type="base" hasError="true" variant="base">
+        <lightning:progressStep label="Personal Details" value="1" />
+        <lightning:progressStep label="Additional Information" value="2" />
+    </lightning:progressIndicator>
+
+    <aura:if isTrue="{!v.showLead}">
+        <c:ACE_LeadWizard showSpinner="{!v.showSpinner}" fields="{!v.fields}" leadFields="{!v.leadFields}"
+            aura:id="leadCmp" />
+
+        <aura:set attribute="else">
+            <c:ACE_EnquiryWizard showSpinner="{!v.showSpinner}" aura:id="oppCmp" fields="{!v.enqFields}"
+                leadFields="{!v.leadFields}" />
+        </aura:set>
+    </aura:if>
+
+    <div id="footer" class="footer">
+        <center>
+            <lightning:buttonGroup>
+
+                <lightning:button label="Previous" onclick="{! c.previous }"
+                    disabled="{!if(v.curStep > 1, 'false','true')}" />
+                <lightning:button label="Add Products" onclick="{! c.addProducts }" />
+                <lightning:button label="Submit" onclick="{! c.save }" />
+                <lightning:button label="Next" onclick="{! c.next }" disabled="{!if(v.curStep > 1, 'true','false')}" />
+            </lightning:buttonGroup>
+        </center>
+    </div>
+    <div id="addProducts">
+
+        <aura:if isTrue="{!v.showProds}">
+            <div class="slds-m-around_xx-large">
+                <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+                    aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                    <div class="slds-modal__container">
+                        <!-- ###### MODAL BOX HEADER Start ######-->
+                        <header class="slds-modal__header">
+                            <lightning:buttonIcon iconName="utility:close" onclick="{! c.closeModel }"
+                                alternativeText="close" variant="bare-inverse" class="slds-modal__close" />
+                            <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Add Products</h2>
+                        </header>
+                        <!--###### MODAL BOX BODY Part Start######-->
+                        <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                            <c:ACE_addProdsWizard showModal="{!v.showProds}" productInterests="{!v.productInterests}"
+                                showSpinner="{!v.showSpinner}" />
+                        </div>
+                    </div>
+                </section>
+                <div class="slds-backdrop slds-backdrop_open"></div>
+            </div>
+        </aura:if>
+    </div>
+
+</aura:component>

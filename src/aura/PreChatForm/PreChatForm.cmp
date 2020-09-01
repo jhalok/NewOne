@@ -1,0 +1,66 @@
+<aura:component implements="lightningsnapin:prechatUI" description="Custom pre-chat component for Embedded Chat.">
+    <!-- You must implement "lightningsnapin:prechatUI" for this component to appear in the "Pre-chat Component" customization dropdown in the Embedded Service setup -->
+
+    <!-- Pre-chat field components to render -->
+    <aura:attribute name="prechatFieldComponents" type="List" description="An array of objects representing the pre-chat fields specified in pre-chat setup."/>
+    <aura:attribute name="regNo" type="String" />
+
+    <!-- Handler for when this component is initialized -->
+    <aura:handler name="init" value="{!this}" action="{!c.onInit}" />
+
+    <!-- For Aura performance -->
+    <aura:locator target="startButton" description="Pre-chat form submit button."/>
+    
+    <!-- Contains methods for getting pre-chat fields, starting a chat, and validating fields -->
+    <lightningsnapin:prechatAPI aura:id="prechatAPI"/>
+    <aura:html tag="style">
+        div.prechatContent{
+        /*background-color:yellow;*/
+        }
+        div.prechatContent div{
+        /*border-color:red;*/
+        border:thick solid white;
+        margin-top:6px;
+        margin-bottom:6px;
+        }
+        div.prechatContent div input {
+        /*background: blue;*/
+        float:right;
+        margin-right:20px;
+        }
+        div.prechatContent div span:nth-child(1) {
+        /*background: green;*/
+        /*float:left;*/
+        }
+        div.prechatContent div span:nth-child(2) {
+        color: red;
+        }
+    </aura:html>
+    
+    <lightning:layout horizontalAlign="space">
+        <lightning:layoutItem size="6" flexibility="auto" >
+            <lightning:card title="Please Enter Basic Details">
+                <br/><br/>
+                <div class="prechatUI">
+                    <div class="prechatContent slds-grid slds-wrap">
+                        <ul class="fieldsList slds-chat-list">
+                            <!-- Look in the controller's onInit function. This component dynamically creates the pre-chat field components -->
+                            {!v.prechatFieldComponents}
+                        </ul>
+                        <ul class="slds-chat-list"><div>Veh. Regi. Num.<input type="text" name="liveagent.prechat:regNum" value="{!v.regNo}" aura:id="rNum"/></div></ul>
+                    </div>
+                    <input type="hidden" name="liveagent.prechat.save:regNum" value="Veh_Regi_Num__c" />
+                    <br />
+                    <div class="startButtonWrapper">
+                        <ui:button aura:id="startButton" class="startButton" label="{!$Label.LiveAgentPrechat.StartChat}" press="{!c.handleStartButtonClick}"/>
+                    </div>
+                    <br/><br/><br/>
+                    <strong>Helpline Number: <u>1800-XXX-1234</u></strong> 
+                    <br/><br/>
+                    <strong>Support Email-Id: <u>test@mahindra.com</u></strong>
+                    
+                </div>
+            </lightning:card>
+        </lightning:layoutItem>
+    </lightning:layout>
+</aura:component>

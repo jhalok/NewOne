@@ -1,0 +1,15 @@
+<aura:component controller="ACE_FormulaPathController" implements="force:hasRecordId,force:hasSObjectName,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes" access="global">
+    <aura:attribute name="fieldApiName" type="String"/>
+    <aura:attribute name="sObjectApiName" type="String" default="Opportunity"/>
+    <aura:attribute name="showPath" type="Boolean" default="false"/>
+
+    <aura:handler name="init" value="{! this }" action="{! c.doInit }" />
+
+    <aura:if isTrue="{! v.showPath }">
+        <lightning:recordViewForm recordId="{! v.recordId }" objectApiName="{! v.sObjectApiName }">
+            <div class="slds-card container">
+                <lightning:outputField fieldName="{! v.fieldApiName }" variant="label-hidden"/>
+            </div>
+        </lightning:recordViewForm>
+    </aura:if>
+</aura:component>

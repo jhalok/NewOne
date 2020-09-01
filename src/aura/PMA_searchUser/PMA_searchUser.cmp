@@ -1,0 +1,78 @@
+<aura:component controller="ACE_leadlist" implements="forceCommunity:searchInterface" access="global">
+
+    <aura:attribute name="selectedRecord" type="Object" />
+    <aura:attribute name="oppCount" type="integer" />
+    <aura:attribute name="listOfSearchRecords" type="Object[]" />
+    <aura:attribute name="SearchKeyWord" type="string" />
+    <aura:attribute name="objectAPIName" type="string" default="" />
+    <aura:attribute name="IconName" type="string" default="" />
+    <aura:attribute name="label" type="string" default="" />
+    <aura:attribute name="Message" type="String" default="" />
+    <aura:attribute name="ownerId" type="String" />
+    <aura:attribute name="objectType" type="String" />
+    <aura:handler name="userEvents" event="c:selectedUserpma" action="{!c.handleTheComponentEvent}" />
+    <aura:method name="getNameFromEditForm" action="{!c.fromPMAUpdate}" access="public">
+        <aura:attribute name="selectedName" type="Object" />
+    </aura:method>
+
+
+    <div onmouseleave="{!c.onblur}" aura:id="searchRes" class="slds-form-element slds-lookup slds-is-close"
+        data-select="single">
+
+        <div class="slds-form-element__control">
+            <div class="slds-input-has-icon slds-input-has-icon--right">
+
+                <!-- This markup is for when an record is selected -->
+                <div aura:id="lookup-pill" class="slds-pill-container slds-hide">
+                    <lightning:pill class="pillSize" label="{!v.selectedRecord.name}" name="{!v.selectedRecord.name}"
+                        onremove="{! c.clear }">
+                        <aura:set attribute="media">
+                            <lightning:icon iconName="standard:user" alternativeText="user" />
+                        </aura:set>
+                    </lightning:pill>
+                </div>
+                <div aura:id="lookupField" class="">
+                    <lightning:icon class="slds-input__icon slds-show" iconName="utility:search" size="x-small"
+                        alternativeText="search" />
+                    <span class="slds-icon_container  slds-combobox__input-entity-icon" title="record">
+                        <lightning:icon class="slds-icon slds-icon slds-icon_small slds-icon-text-default"
+                            iconName="{!v.IconName}" size="x-small" alternativeText="icon" />
+                        <span class="slds-assistive-text"></span>
+                    </span>
+                    <ui:inputText click="{!c.onfocus}" updateOn="keyup" keyup="{!c.keyPressController}"
+                        class="slds-lookup__search-input slds-input leftPaddingClass" value="{!v.SearchKeyWord}"
+                        placeholder="Search.." />
+                </div>
+            </div>
+        </div>
+
+        <!--This part is for Display typehead lookup result List-->
+        <ul style="min-height:40px;margin-top:0px !important"
+            class="slds-dropdown slds-dropdown_fluid slds-lookup__menu slds"
+            role="listbox">
+            <lightning:spinner class="slds-hide" variant="brand" size="small" aura:id="mySpinner" />
+            <center> {!v.Message}</center>
+            <table class="slds-table slds-table_cell-buffer slds-table_bordered" style="width:100%;border-right: .5px solid #d8d8d8;">
+                <tbody>
+                    <!--<tr><th style="margin-left: 2.4rem;width:200px !important;"><b>Name</b></th><th style="width:30%"><b>No of Enquiry</b></th></tr>-->
+                    <li role="presentation" class="slds-listbox__item" onclick="{!c.selectRecord}">
+                    <span id="listbox-option-unique-id-01"
+                        class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta"
+                          role="option">
+                        	<div class="slds-media__figure" style="margin-left: 5rem; font-size: larger;">
+                                <span class="slds-icon_container" title="Description of icon when needed"><b>Name</b></span></div>
+                        	<div class="slds-media__figure" style="font-size: larger; text-align: right; width: 9rem; }">
+                                <span class="slds-icon_container" title="Description of icon when needed"><b>No of Enquiry</b></span></div> 
+                        </span></li>
+                    <aura:iteration items="{!v.listOfSearchRecords}" var="singleRec">
+                        <tr class="slds-hint-parent">
+                            <c:PMA_searchList objRec="{!singleRec}" IconName="{!v.IconName}"
+                                userName="{!v.selectedRecord}" />
+                        </tr>
+                    </aura:iteration>
+                </tbody>
+            </table>
+        </ul>
+    </div>
+
+</aura:component>

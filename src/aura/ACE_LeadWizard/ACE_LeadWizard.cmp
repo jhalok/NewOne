@@ -1,0 +1,51 @@
+<aura:component
+    implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader"
+    access="global" controller="ACE_WizardController">
+
+    <aura:method name="handleSave" action="{!c.handleSave}" access="public" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:attribute name="showSpinner" type="boolean" />
+
+    <aura:attribute name="curStep" type="String" default="1" />
+
+    <aura:attribute name="leadFields" type="object" />
+    <aura:attribute name="navigate" type="boolean" default="true" />
+
+    <aura:registerEvent name="comWizardMessage" type="c:ACE_comWizardMessage" />
+    <aura:attribute name="fields" type="object" />
+    <lightning:recordEditForm onload="{!c.handleLoad}" onsubmit="{!c.handleSubmit}" onsuccess="{!c.handleSuccess}"
+        objectApiName="Lead" aura:id="leadForm">
+
+        <!-- the messages component is for error messages -->
+        <div>
+            <div class="slds-modal__content slds-p-around--medium slds-grid slds-wrap ">
+                <aura:iteration items="{!v.fields}" var="fld" indexVar="key">
+                    <lightning:accordion aura:id="accordion" activeSectionName="Personal Details"
+                        allowMultipleSectionsOpen="true">
+                        <lightning:accordionSection name="{!fld.key}" label="{!fld.key +' :'}">
+                            <div class="slds-grid slds-wrap slds-gutters">
+                                <aura:iteration items="{!fld.value}" var="mapValue">
+                                    <div class="slds-col slds-size_1-of-2 ">
+                                        <div class="value">
+                                            <aura:if isTrue="{!mapValue.fieldName == 'Salutation'}">
+
+                                                <div style="display:none">
+                                                    <lightning:inputField fieldName="Name" />
+                                                </div>
+                                            </aura:if>
+                                            <lightning:inputField fieldName="{!mapValue.fieldName}"
+                                                value="{!mapValue.val}" required="{!mapValue.required}"
+                                                variant="label-stacked" aura:id="leadFields" />
+                                        </div>
+                                    </div>
+                                </aura:iteration><br />
+                            </div>
+                        </lightning:accordionSection>
+                    </lightning:accordion>
+                </aura:iteration>
+            </div>
+        </div>
+
+    </lightning:recordEditForm>
+
+</aura:component>

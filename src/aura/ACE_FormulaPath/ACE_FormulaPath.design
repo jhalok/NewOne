@@ -1,0 +1,4 @@
+<design:component >
+    <design:attribute name="sObjectApiName" label="SObject API Name" />
+    <design:attribute name="fieldApiName" label="Field API Name" required="true"/>
+</design:component>

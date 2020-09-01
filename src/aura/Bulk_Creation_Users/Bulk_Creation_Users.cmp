@@ -1,0 +1,79 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,force:appHostable" controller="bulkCreationUserController">
+    <aura:handler name="init" value="{!this}" action="{! c.doInIt}"/>
+    <ltng:require scripts="/resource/CsvUploadParse" afterScriptsLoaded="{!c.scriptsLoaded}" />
+    <aura:attribute name="requiredFields" type="List" />
+    <aura:attribute name="errorRecordsList" type="List" />
+    <aura:attribute name="successRecordsList" type="List" />
+    <aura:attribute name="dataList" type="List" />
+    <aura:attribute name="indexNumber" type="List" />
+    <aura:attribute name="headerList" type="List" />
+    <aura:attribute name="isVisible" type="boolean" default="false"/>
+    <aura:attribute name="errorMessage" type="String" /> 
+    <aura:attribute name="successMessage" type="String" />
+    <div style="position:relative">
+        <div class="slds-grid slds-gutters slds-m-around_large" >
+            <div class="slds-col slds-p-top_large">
+                <center>
+                    <span><lightning:button label="CSV Template" iconName="utility:download" iconPosition="left"  variant="brand" onclick="{!c.downloadCsvTemplate}"/></span>
+                </center>
+            </div>
+            <div class="slds-col">
+                <center>
+                    <span><lightning:input name="Upload CSV" 
+                                           type="file" 
+                                           label="Upload CSV" 
+                                           multiple="false" 
+                                           accept=".CSV" 
+                                           onchange="{!c.uploadCSV}"/></span>
+                </center>
+            </div>
+            <div class="slds-col slds-p-top_large">
+                <center>
+                    <span><lightning:button label="Error Log" iconName="utility:download" iconPosition="left"  variant="brand" onclick="{!c.errorList}"/></span>
+                </center>
+            </div>
+        </div>
+        <aura:if isTrue = "{!v.isVisible}">
+            
+            <lightning:layout class="" multipleRows="true">
+                <lightning:layoutItem class="" size="12" mediumDeviceSize="12" largeDeviceSize="12" flexibility="auto">
+                    <div style="overflow: auto;width:1000px;overflow-y: scroll;">
+                        <table class="slds-table slds-table_bordered slds-table_cell-buffer"> 
+                            <thead>
+                                <tr class="slds-text-title_caps">
+                                    <aura:iteration items="{!v.headerList}" var="item">
+                                        <th scope="col">
+                                            <div class="slds-truncate" title="First Name">{!item}</div>
+                                        </th>
+                                    </aura:iteration>
+                                    <th scope="col">
+                                        <div class="slds-truncate" title="Status">Status</div>
+                                    </th>
+                                    <th scope="col">
+                                        <div class="slds-truncate" title="Error Description	">Error Description</div>
+                                    </th>
+                                    <th scope="col">
+                                        <div class="slds-truncate" title="System Error	">System Error</div>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody aura:id="addRowTbody"> 
+                                <aura:iteration items="{!v.errorRecordsList}" var="row" indexVar="index">
+                                    <tr class="multipleRows">
+                                        <aura:iteration items="{!row}" var="item" indexVar="index">
+                                            <td > 
+                                                <ui:outputText value="{!item}"/>
+                                            </td>
+                                        </aura:iteration>
+                                        
+                                    </tr>
+                                </aura:iteration>
+                            </tbody>
+                        </table>
+                    </div>
+                </lightning:layoutItem>
+            </lightning:layout>
+        </aura:if>
+        <lightning:spinner aura:id="Spinner" variant="brand" alternativeText="Loading" style="position:absolute"/>
+    </div>
+</aura:component>

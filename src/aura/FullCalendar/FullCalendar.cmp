@@ -1,0 +1,54 @@
+<aura:component controller="FullCalendarController" implements="forceCommunity:availableForAllPageTypes,force:hasRecordId,force:recordTab" access="global" >
+    <ltng:require styles="{!$Resource.Calender     + '/packages/core/main.css'}"
+          scripts="{!join(',',
+                       $Resource.Calender  + '/packages/core/main.js',
+                       $Resource.Calender  + '/packages/interaction/main.js',
+                   $Resource.Calender  + '/packages/daygrid/main.js',
+                   $Resource.Calender  + '/packages/timegrid/main.js',
+                    $Resource.jquery
+                      )}"
+          afterScriptsLoaded="{!c.afterScriptsLoaded}" />
+    <ltng:require styles="{!$Resource.Calender     + '/packages/daygrid/main.css'}" /> 
+ 	 <ltng:require styles="{!$Resource.Calender     + '/packages/timegrid/main.css'}" /> 
+    
+     <aura:attribute name="events" type="Object[]" />
+     <aura:attribute name="isOpen" type="boolean" default="false"/>
+    <aura:attribute name="startDate" type="string" />
+    <aura:attribute name="endDate" type="string" />
+  
+    <aura:attribute name="recordLead" type="Lead" />
+    <div ></div>
+    <ul id="ulData">
+    	<li aura:id="calendar" id="calendar" style=" margin-top: 50px !important;"></li>
+    </ul>
+    <div class="slds-m-around_xx-large">
+        <aura:if isTrue="{!v.isOpen}">
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container" style="width: 80%; max-width: unset; height:500	px !important; max-height: unset;">
+
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close"
+                                              onclick="{! c.closeModel }"
+                                              alternativeText="close"
+                                              variant="bare-inverse"
+                                              class="slds-modal__close"/>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Schedule Test Drive </h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+						 <lightning:recordEditForm aura:id="recordViewForm"
+                                     objectApiName="Test_Drive__c" 
+                                     onsuccess="{!c.onRecordSuccess}">
+                            <lightning:messages />
+                            <lightning:inputField fieldName="Test_Drive_by__c" value="{!v.recordLead.Id}" disabled = 'true'  />
+                            <lightning:inputField fieldName="End_Date_Time__c" value="{!v.startDate}" />
+                            <lightning:inputField fieldName="End_Date_Time__c" value='{!v.endDate}' />
+                            <lightning:button aura:id="submit" type="submit" label="Schedule" variant="brand" class="  slds-m-top_medium pullright"   />
+                            </lightning:recordEditForm>
+                    </div>
+                   
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </aura:if>
+    </div>
+</aura:component>

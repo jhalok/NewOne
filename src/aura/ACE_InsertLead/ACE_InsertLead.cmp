@@ -1,0 +1,91 @@
+<aura:component
+  implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,lightning:actionOverride,forceCommunity:availableForAllPageTypes,force:lightningQuickAction"
+  access="global"
+  controller="ACE_InsertLeadController"
+>
+  <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+
+  <!-- This attribute is used to store the field names of Quote present on the Quote Layout. -->
+  <aura:attribute name="fields" type="object" />
+  <aura:attribute name="recordId" type="String" />
+  <aura:attribute name="showButton" type="Boolean" default="false" />
+  <aura:attribute name="hideLayer" type="Boolean" default="true" />
+  <aura:attribute name="LeadId" type="String" />
+  <aura:attribute name="showSpinner" type="boolean" default="false" />
+  <div class="mainDiv ">
+    <aura:if isTrue="{! v.showSpinner }">
+      <lightning:spinner alternativeText="Loading" />>
+    </aura:if>
+    
+    
+    <div class="parent ">
+      <lightning:recordEditForm
+        onload="{!c.handleLoad}"
+        onsubmit="{!c.handleSubmit}"
+        onsuccess="{!c.handleSuccess}"
+        objectApiName="Lead"
+      >
+        <!-- the messages component is for error messages -->
+        
+        <div
+          aura:id="editDialog"
+          role="dialog"
+          tabindex="-1"
+          aria-labelledby="header43"
+          class="slds-modal slds-fade-in-open"
+        >
+        
+          <div class="slds-modal__container">
+            <div class="slds-modal__header">
+                <lightning:buttonIcon class="slds-modal__close" alternativeText="Close" iconName="utility:close" variant="bare" size="large" onclick="{!c.cancelDialog}"/>
+              <h2
+                class="slds-p-top--large slds-p-horizontal--medium slds-p-bottom--medium slds-text-heading--medium"
+              >
+                New Lead
+              </h2>
+            </div>
+            <div
+              class="slds-modal__content slds-p-around--medium slds-grid slds-wrap "
+            >
+              <aura:iteration items="{!v.fields}" var="fld" indexVar="key">
+                <div class="slds-section head">
+                  <h3
+                    class="slds-section__title slds-theme_shade primaryPaletteBorder slds-border_top"
+                  >
+                    <span class="slds-p-horizontal--small slds-truncate"
+                      >{!fld.key}</span
+                    ></h3
+                  ></div
+                ><br />
+                <div class="slds-grid slds-wrap slds-gutters">
+                  <aura:iteration items="{!fld.value}" var="mapValue">
+                    <div class="slds-col slds-size_1-of-2 ">
+                      <div class="value">
+                        <lightning:inputField
+                          fieldName="{!mapValue.fieldName}" required="{!mapValue.required}"
+                        />
+                      </div>
+                    </div>
+                  </aura:iteration><br/>
+                </div>
+              </aura:iteration>
+            </div>
+            <div class="slds-modal__footer">
+              <lightning:button 
+              variant="neutral" 
+              label="Cancel" 
+              onclick="{!c.cancelDialog}"
+              />
+              <lightning:button
+                variant="brand"
+                label="Save"
+                type="submit"
+                name="save"
+              />
+            </div>
+          </div>
+        </div>
+      </lightning:recordEditForm>
+    </div> </div
+  ><div aura:id="overlay" class="slds-backdrop slds-backdrop--open"></div>
+</aura:component>

@@ -1,0 +1,253 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction" access="global" Controller="ACE_ExistingVehicles" >
+    <aura:attribute name="existingVehicleList" type="ACE_Existing_Vehicle__c[]" />
+    <aura:attribute name="CompetitorsList" type="List[]" />
+    <aura:attribute name="modelList" type="List[]" />
+    <aura:attribute name="rowIndex" type="String"/>
+    <aura:attribute name="curMake" type="string"/>
+    <aura:attribute name="makeModelMap1" type="map"/>
+    <aura:attribute name="allRegistrationNumber" type="string[]"/>
+    <aura:attribute name="currentSelected" type="object" />
+    <aura:attribute name="test" type="string" default="Land Rover"/>
+    
+    <aura:attribute name="single" type="sobject" default="{'sobjectType': 'ACE_Existing_Vehicle__c',
+                                                          'Name': '',
+                                                          'ACE_Make__c': '',
+                                                          'ACE_Model__c': '',
+                                                          'ACE_Is_Exchange_Vehicle__c': false,
+                                                          'ACE_KMs_Reading__c': '',
+                                                          'ACE_Vehicle_Usage__c': '',
+                                                          'ACE_Registration_Number__c': '',
+                                                          'ACE_Registered_Year__c': '',
+                                                          'ACE_Registered_Month__c': '',
+                                                          'Plus_Sign__c': ''
+                                                          }"/>
+    <aura:attribute name="leadRecord" type="Lead" />
+    <aura:attribute name="allExisting_Vehicle" type="ACE_Existing_Vehicle__c[]" />
+    <aura:attribute name="startingIndex" type="Integer" />
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:registerEvent name="clsPopupEvent" type="c:ACE_CloseParentFromChild" />
+    
+    <aura:html tag="style">
+        .slds-modal__container {
+        width : 95% !important;
+        max-width: unset !important;
+        }
+    </aura:html>
+    <div class="slds-grid slds-gutters slds-wrap slds-p-around_small slds-align_absolute-center" style="width:80%">
+        <div class="slds-col">
+            <h4>Name:  {!v.leadRecord.Salutation}&nbsp;{!v.leadRecord.Name}</h4>
+        </div>
+        <div class="slds-col">
+            <h4>Mobile No.: {!v.leadRecord.MobilePhone}</h4>
+        </div>
+        <div class="slds-col">
+            <h4> City:  {!v.leadRecord.City}  </h4>
+        </div>
+    </div>
+    
+    <!--Table Part--> 
+    <table class="slds-table slds-table_bordered slds-table_cell-buffer"> 
+        <thead>
+            <tr class="slds-text-title_caps myRow" >
+                <th scope="col">
+                    <div class="" style = "text-align:center;">S.No.</div>
+                </th>
+                <th scope="col">
+                    <div class="" style = "text-align:center;" title="Make">Make</div>
+                </th>
+                <th scope="col">
+                    <div class="" style = "text-align:center;" title="Model">Model</div>
+                </th>
+                <th scope="col">
+                    <div class="" style = "text-align:center;" title="Is Exchange Vehicle ?">Is Exchange <br /> Vehicle ?</div>
+                </th>
+                <th scope="col">
+                    <div class="" style = "text-align:center;" title="Kms Reading">Kms Reading</div>
+                </th>
+                <th scope="col">
+                    <div class="" style = "text-align:center;" title=" Vehicle Usage">Vehicle Usage	</div>
+                </th>
+                <th scope="col">
+                    <div class="" style = "text-align:center;" title=" Registration No.">Registration No.</div>
+                </th>
+                <th scope="col">
+                    <div class="" style = "text-align:center;" title=" Registered Year	">Registered Year	</div>
+                </th>
+                <th scope="col">
+                    <div class="" style = "text-align:center;" title=" Registered Month	">Registered Month	</div>
+                </th>
+                <!--  <th scope="col">
+                    <div class="" style = "text-align:center;"  title=" Delete	">Action	</div>
+                </th> -->
+                <th scope="col">
+                    <div class="slds-truncate" style="text-transform: capitalize;text-align:center;"
+                         title=" Action	">Action </div>
+                </th>
+            </tr>
+        </thead>
+        
+        <tbody aura:id="addRowTbody"> 
+            
+            <aura:if isTrue="{!v.allExisting_Vehicle.length > 0}">
+                <aura:iteration items="{!v.allExisting_Vehicle}" var="exi" indexVar="index">
+                    <tr class="multipleRows">
+                        <td style="padding-top: 23px !important;padding-left: 24px !important;text-align:center;" > 
+                            {!index+1}
+                        </td>
+                        <td  > 
+                            <lightning:input name="inputMake" id="{!index}" value="{!exi.ACE_Make__c}" onblur="{!c.updateExistingRecord}" onfocus="{!c.trackChange}"  />
+                        </td>
+                        <td   > 
+                            <lightning:input name="inputModel" id="{!index}" value="{!exi.ACE_Model__c}" onblur="{!c.updateExistingRecord}" onfocus="{!c.trackChange}" />
+                        </td>
+                        <td  style="padding-top: 23px !important;padding-left: 24px !important;text-align:center;"> 
+                            <lightning:input type="checkbox" id="{!index}" name="Is Vehicle Exchange ?"  data-id="{!index}" onfocus="{!c.trackChange}"  checked="{!exi.ACE_Is_Exchange_Vehicle__c}" onblur="{!c.updateExistingRecord}"   />
+                        </td>
+                        <td  > 
+                            <lightning:input name="inputKMsReading" id="{!index}" disabled="{!!exi.ACE_Is_Exchange_Vehicle__c}"  value="{!exi.ACE_KMs_Reading__c}" onfocus="{!c.trackChange}" onblur="{!c.updateExistingRecord}"/>
+                        </td>
+                        <td > 
+                            <lightning:input  name="inputVehicleUsage" id="{!index}" disabled="{!!exi.ACE_Is_Exchange_Vehicle__c}" value="{!exi.ACE_Vehicle_Usage__c}" onfocus="{!c.trackChange}" onblur="{!c.updateExistingRecord}"/>
+                        </td>
+                        <td  > 
+                            <lightning:input name="inputRegistrationNumber" id="{!index}" disabled="{!!exi.ACE_Is_Exchange_Vehicle__c}" value="{!exi.ACE_Registration_Number__c}" onfocus="{!c.trackChange}"  onchange="{!c.validateRegistrationNumber}" />
+                        </td>
+                        <td > 
+                            <lightning:input name="inputRegisteredYear" id="{!index}" disabled="{!!exi.ACE_Is_Exchange_Vehicle__c}"  value="{!exi.ACE_Registered_Year__c}" onfocus="{!c.trackChange}" onblur="{!c.updateExistingRecord}"/>
+                        </td>
+                        <td> 
+                            <lightning:select    value="{!exi.ACE_Registered_Month__c}" disabled="{!!exi.ACE_Is_Exchange_Vehicle__c}" onfocus="{!c.trackChange}" onchange="{!c.updateExistingRecord}"  >
+                                <option value="January">January</option>
+                                <option value="February">February</option>
+                                <option value="March">March</option>
+                                <option value="April">April</option>
+                                <option value="May">May</option>
+                                <option value="June">June</option>
+                                <option value="July">July</option>
+                                <option value="August">August</option>
+                                <option value="September">September</option>
+                                <option value="October">October</option>
+                                <option value="November">November</option>
+                                <option value="December">December</option>
+                            </lightning:select>
+                        </td>
+                        <td  style="padding-top: 23px !important;padding-left: 24px !important;text-align:center;">
+                            <a onclick="{!c.delExRow}" id="{!index}" data-id="{!exi.Id}" style="float:left">
+                                <lightning:icon variant="error" iconName="utility:delete" class="slds-icon slds-icon_small" size="small" alternativeText="icon"/>
+                                <span class="slds-assistive-text">Delete Icon</span>
+                            </a>
+                        </td>                   
+                        
+                    </tr>
+                </aura:iteration>
+            </aura:if> 
+            <aura:iteration items="{!v.existingVehicleList}" var="exi" indexVar="index">
+                <tr class="multipleRows">
+                    <td style="padding-top: 23px !important;padding-left: 24px !important;text-align:center;" > 
+                        {!index + v.startingIndex+1}
+                    </td>
+                    <!--<td> 
+                        <lightning:input name="inputMake" value="{!exi.ACE_Make__c}" />
+                    </td>-->
+                    <td data-label="Interested_In__c" scope="row" style="padding-top: 19px !important; "
+                        class="{!index}" id="{!index}">
+                        <lightning:select name="p" aura:id="p" class="hideLab" value="{!exi.ACE_Make__c}"
+                                          onchange="{!c.getModal}">
+                            <option value="">choose one...</option>
+                            <aura:iteration items="{!v.CompetitorsList[0].allMakes}" var="item">
+                                <option value="{!item}">{!item}</option>
+                            </aura:iteration>
+                        </lightning:select>
+                    </td>
+                    <!-- <td> 
+                        <lightning:input name="inputModel" value="{!exi.ACE_Model__c}"/>
+                    </td> -->
+                    
+                    <td data-label="Interested_In__c" scope="row" style="padding-top: 19px !important; ">
+                        
+                        <lightning:select name="select2" class="hideLab" value="{!exi.ACE_Model__c}">
+                            <option value="">choose one...</option>
+                            <aura:iteration items="{!v.CompetitorsList[0].allNewCompetitors[0].allModels}" var="Model">
+                                <option value="{!Model}">{!Model}</option>
+                            </aura:iteration>
+                        </lightning:select>
+                    </td>
+                    <td  style="padding-top: 23px !important;padding-left: 24px !important;text-align:center;"> 
+                        
+                        <lightning:input type="checkbox" name="Is Vehicle Exchange ?" id="{!index}" data-id="{!index}"  checked="{!exi.ACE_Is_Exchange_Vehicle__c}" onchange="{!c.enableDisable}"  />
+                    </td>
+                    <td  > 
+                        <lightning:input name="inputKMsReading" disabled="{!!exi.ACE_Is_Exchange_Vehicle__c}" value="{!exi.ACE_KMs_Reading__c}"/>
+                    </td>
+                    <td > 
+                        <lightning:input name="inputVehicleUsage" disabled="{!!exi.ACE_Is_Exchange_Vehicle__c}" value="{!exi.ACE_Vehicle_Usage__c}"/>
+                    </td>
+                    <td  > 
+                        <lightning:input name="inputRegistrationNumber" disabled="{!!exi.ACE_Is_Exchange_Vehicle__c}" value="{!exi.ACE_Registration_Number__c}" onblur="{!c.validateRegistrationNumber}"  />
+                    </td>
+                    <td > 
+                        <lightning:input name="inputRegisteredYear" disabled="{!!exi.ACE_Is_Exchange_Vehicle__c}" value="{!exi.ACE_Registered_Year__c}"/>
+                    </td>
+                    
+                    
+                    <!--<td  style="padding-top: 23px !important;padding-left: 24px !important;text-align:center;">
+                        <a onclick="{!c.delSingleRow}" id="{!index}" style="float:left">
+                            <lightning:icon variant="error" iconName="utility:delete" class="slds-icon slds-icon_small" size="small" alternativeText="icon"/>
+                            <span class="slds-assistive-text">Delete Row</span>
+                        </a>
+                        <aura:if isTrue="{!index==(v.existingVehicleList.length-1)}">
+                            <a onclick="{!c.addRowData}" id="{!index}" >
+                                <lightning:icon variant="brand" iconName="utility:add" class="slds-icon slds-icon_small" size="small" alternativeText="Add More"/>
+                                <span class="slds-assistive-text">Add More</span>
+                            </a>
+                        </aura:if>
+                    </td>-->
+                     <td scope="row"> 
+                        <lightning:select  value="{!exi.ACE_Registered_Month__c}" disabled="{!!exi.ACE_Is_Exchange_Vehicle__c}" >
+                            <option value="January">January</option>
+                            <option value="February">February</option>
+                            <option value="March">March</option>
+                            <option value="April">April</option>
+                            <option value="May">May</option>
+                            <option value="June">June</option>
+                            <option value="July">July</option>
+                            <option value="August">August</option>
+                            <option value="September">September</option>
+                            <option value="October">October</option>
+                            <option value="November">November</option>
+                            <option value="December">December</option>
+                        </lightning:select>
+                    </td>
+                    <td scope="row" style="padding-top: 23px !important;padding-left: 24px !important;text-align:center;">
+                        
+                        <a onclick="{!c.delSingleRow}" id="{!index}" style="float:left">
+                            <lightning:icon variant="error" iconName="utility:delete"
+                                            class="slds-icon slds-icon_small" size="small" alternativeText="Delete Row" />
+                            <span class="slds-assistive-text">Delete Icon</span>
+                        </a>
+                        
+                                
+                        <aura:if isTrue="{!index==(v.existingVehicleList.length-1)}">
+                            <a onclick="{!c.addRowData}" id="{!index}">
+                                <lightning:icon variant="error" iconName="utility:add"
+                                                class="slds-icon slds-icon_small" size="small" alternativeText="Add More" />
+                                <span class="slds-assistive-text">Add More</span>
+                            </a>
+                        </aura:if>
+                                    </td>
+                        
+                   
+                    
+                </tr>
+            </aura:iteration>
+        </tbody>
+    </table>
+    <footer class="slds-modal__footer">
+        <div class ="slds-grid slds-grid_align-end">
+            <!--<button class="slds-button slds-button_brand addrow"  onclick="{!c.addRowData}">Add More</button>--><!--style="float: right !important;margin-top: 15px !important;"-->
+            <button class="slds-button slds-button_brand" style="float: right;" onclick="{!c.closeModel}">Cancel</button>
+            <button class="slds-button slds-button_brand"  onclick="{!c.saveData}">Save</button><!--style="margin-top: 15px !important; right: -87%"-->
+        </div>
+    </footer>
+</aura:component>

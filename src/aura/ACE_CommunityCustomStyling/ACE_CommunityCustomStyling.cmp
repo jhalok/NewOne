@@ -1,0 +1,15 @@
+<aura:component controller="ACE_CommunityCustomStylingController" implements="force:hasRecordId,force:hasSObjectName,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes" access="global">
+    
+    <aura:attribute name="navItemNumber" type="Integer" />
+
+    <aura:handler name="init" value="{! this }" action="{! c.doInit }" />
+
+    <aura:if isTrue="{! v.navItemNumber != null }">
+        <aura:html tag="style">
+            .comm-navigation__list li:nth-child( {! v.navItemNumber } ) .comm-navigation__item a {
+                background: #e31837 !important;
+            }
+        </aura:html>
+    </aura:if>
+
+</aura:component>

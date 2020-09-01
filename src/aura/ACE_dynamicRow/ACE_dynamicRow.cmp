@@ -1,0 +1,198 @@
+<aura:component controller="ACE_ObjectAuraController" Implements="flexipage:availableForRecordHome,force:hasRecordId">
+    <!--Init handler which is call doInit js function on component Load-->
+
+    <aura:attribute name="LeadList" type="List" />
+    <aura:attribute name="exLeads" type="List" />
+    <aura:attribute name="exLeadsLength" type="integer" />
+    <aura:attribute name="newLeadIndex" type="integer" />
+    <aura:handler name="interestList" event="c:getInterests" action="{!c.getInterestList}"/>
+    <aura:attribute name="currentSelected" type="object" />
+    <aura:attribute name="single" type="sobject" default="{
+             'sobjectType': 'Lead',
+            'LastName': '',
+            'MobilePhone': '',
+            'Company': 'testing',
+            'Status': 'Open - Not Contacted',
+            'Contact_Time__c' : '',
+             'Referred_By__c' : '',
+            'disable':false
+        }" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:method name="saveData" action="{!c.saveData}" access="PUBLIC" />
+    <aura:attribute name="contactRecord" type="Contact" />
+    <!--Table Part-->
+    <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+        <thead>
+            <tr class="slds-text-title_caps">
+                <th scope="col">
+                    <div class="" style="text-transform: capitalize;text-align:center;">Sr.No.</div>
+                </th>
+                <th scope="col">
+                    <div class="" style="text-transform: capitalize;text-align:center;" title="Customer Name">Prospect
+                        Name</div>
+                </th>
+                <th scope="col">
+                    <div class="" style="text-transform: capitalize;text-align:center;" title="Mobile Number">Mobile No.
+                    </div>
+                </th>
+                <th scope="col">
+                    <div class="" style="text-transform: capitalize;text-align:center;" title="Email Address">Email
+                        Address</div>
+                </th>
+                <th scope="col">
+                    <div class="" style="text-transform: capitalize;text-align:center;" title=" City">City</div>
+                </th>
+                <th scope="col">
+                    <div class="" style="text-transform: capitalize;text-align:center;" title=" Contact Time">Contact
+                        Date Time</div>
+                </th>
+
+                <th scope="col">
+                    <div class="slds-truncate" style="text-transform: capitalize;text-align:center;" title=" Action	">
+                        Delete </div>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <aura:iteration items="{!v.exLeads}" var="item" indexVar="index">
+                <tr class="slds-text-title_caps">
+                    <td style="    padding-top: 15px;">
+                        {!index + 1}
+                    </td>
+                    <td data-label="Name" scope="row" class="{!index}">
+                        <lightning:input  class="hidelable"  type="text" aura:id="getValueForCheak" value="{!item.LastName}" onblur="{!c.updateLeadData}" onfocus="{!c.trackChange}" />
+                    </td>
+                    <td data-label="MobilePhone" scope="row" class="{!index}" >
+                        <lightning:input class="hidelable" type="phone" value="{!item.MobilePhone}" onblur="{!c.updateLeadData}" onfocus="{!c.trackChange}" />
+                    </td>
+                    <td data-label="Email" scope="row" class="{!index}" >
+                        <lightning:input class="hidelable" type="Email" value="{!item.Email}"  onblur="{!c.updateLeadData}" onfocus="{!c.trackChange}" />
+                    </td>
+                    <td data-label="Address" scope="row" class="{!index}" >
+                        <lightning:input class="hidelable" type="text" value="{!item.City__c}" onblur="{!c.updateLeadData}" onfocus="{!c.trackChange}" />
+                    </td>
+                    <td data-label="Date" scope="row" class="{!index}" >
+                        <lightning:input class="hidelable" type="datetime" value="{!item.Next_FollowUp__c}" onblur="{!c.updateLeadData}" onfocus="{!c.trackChange}" />
+                    </td>
+                    <td style="    padding-top: 15px;text-align:center;">
+                        <a onclick="{!c.delSingleRow}" id="{!index}">
+                            <lightning:icon variant="error" iconName="utility:delete" class="slds-icon slds-icon_small"
+                                size="small" alternativeText="icon" />
+                            <span class="slds-assistive-text">Delete Icon</span>
+                        </a>
+                        <a onclick="{!c.addInterest}" id="{!index}" class="">
+                            <lightning:icon variant="error" iconName="action:add_file" size="small"
+                                alternativeText="icon" />
+                            <span class="slds-assistive-text">Add</span>
+                        </a>
+                        <aura:if isTrue="{!item.isOthIntOpen}">
+                            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+                                aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                                <div class="slds-modal__container" style="width: 28% !important;">
+                                    <!-- Modal/Popup Box Header Starts here -->
+                                    <header class="slds-modal__header">
+                                        <lightning:buttonIcon iconName="utility:close" onclick="{! c.closeOthInt }"
+                                            alternativeText="close" variant="bare-inverse" class="slds-modal__close"
+                                            value="{!index}" />
+                                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Add
+                                            Competition </h2>
+                                    </header>
+                                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                                        <c:ACE_Product_Interest_Prioritization leadId="{!item.Id}"></c:ACE_Product_Interest_Prioritization>
+                                    </div>
+                                    <!--Modal/Popup Box Footer Starts here-->
+                                    <!--<footer class="slds-modal__footer">
+                                                    <lightning:button variant="Brand"
+                                                                      label="Close Call"
+                                                                      title="Close Call"
+                                                                      onclick="{! c.doCloseCall }"/> 
+                                                    <lightning:button variant="brand"
+                                                                      label="Cancel"
+                                                                      title="Cancel"
+                                                                      onclick="{! c.closeOtherInt }"/> 
+                                                </footer> -->
+                                </div>
+                            </section>
+                            <div class="slds-backdrop slds-backdrop_open"></div>
+                        </aura:if>
+                    </td>
+                </tr>
+            </aura:iteration>
+            <aura:iteration items="{!v.LeadList}" var="item" indexVar="indexnew">
+                <tr class="slds-text-title_caps">
+                    <td style="    padding-top: 15px;" class="hidelable">
+                        {!v.exLeadsLength + 1 + indexnew}
+                    </td>
+                    <td data-label="Name" scope="row" >
+                        <lightning:input type="text" class="hidelable" aura:id="getValueForCheak" value="{!item.LastName}"
+                            disabled="{!item.disable}" />
+                    </td>
+                    <td data-label="MobilePhone" scope="row" >
+                        <lightning:input type="phone" class="hidelable" value="{!item.MobilePhone}" disabled="{!item.disable}" />
+                    </td>
+                    <td data-label="Email" scope="row" >
+                        <lightning:input type="Email"  class="hidelable" value="{!item.Email}" disabled="{!item.disable}" />
+                    </td>
+                    <td data-label="Address" scope="row" >
+                        <lightning:input type="text" class="hidelable" value="{!item.City__c}" disabled="{!item.disable}" />
+                    </td>
+                    <td data-label="Date" scope="row">
+                        <lightning:input type="datetime"  class="hidelable" value="{!item.Next_FollowUp__c}" disabled="{!item.disable}" />
+                    </td>
+                    <td style=" padding-top: 15px;text-align:center;">
+                        <a onclick="{!c.delSingleRow}" id="{!indexnew}">
+                            <lightning:icon variant="error" iconName="utility:delete" class="slds-icon slds-icon_small"
+                                size="small" alternativeText="icon" />
+                            <span class="slds-assistive-text">Delete Icon</span>
+                        </a>
+                        <a onclick="{!c.addInterestinNew}" id="{!indexnew}" class="">
+                            <lightning:icon variant="error" iconName="action:add_file" size="small"
+                                alternativeText="icon" />
+                            <span class="slds-assistive-text">Add</span>
+                        </a>
+                        <aura:if isTrue="{!item.isOthIntOpen}">
+                            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+                                aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                                <div class="slds-modal__container" style="width: 28% !important;" >
+                                    <!-- Modal/Popup Box Header Starts here-->
+                                    <header class="slds-modal__header">
+                                        <lightning:buttonIcon iconName="utility:close" onclick="{! c.closeOthIntnew }"
+                                            alternativeText="close" variant="bare-inverse" class="slds-modal__close"
+                                            value="{!indexnew}" />
+                                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Add Product Interest </h2>
+                                    </header>
+                                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1" style="height: 300px;;">
+                                        <c:ACE_Product_Interest_Prioritization leadId="new"></c:ACE_Product_Interest_Prioritization>
+                                    </div>
+                                    <!-- Modal/Popup Box Footer Starts here -->
+                                    <!-- <footer class="slds-modal__footer">
+                                        <lightning:button variant="Brand"
+                                                          label="Close Call"
+                                                          title="Close Call"
+                                                          onclick="{! c.doCloseCall }"/> 
+                                        <lightning:button variant="brand"
+                                                          label="Cancel"
+                                                          title="Cancel"
+                                                          onclick="{! c.closeOtherInt }"/> 
+                                    </footer> -->
+                                </div>
+                            </section>
+                            <div class="slds-backdrop slds-backdrop_open"></div>
+                        </aura:if>
+                        <aura:if isTrue="{!indexnew ==(v.LeadList.length-1)}">
+                            <a onclick="{!c.addRowData}" id="{!indexnew}">
+                                <lightning:icon variant="error" iconName="utility:add" class="slds-icon slds-icon_small"
+                                    size="small" alternativeText="Add More" />
+                                <span class="slds-assistive-text">Add More</span>
+                            </a>
+                        </aura:if>
+                    </td>
+
+                </tr>
+            </aura:iteration>
+        </tbody>
+    </table>
+    <!--<button class="slds-button slds-button_brand addrow" style="float: right !important;margin-top: 15px !important;" onclick="{!c.addRowData}">Add More</button>-->
+    <br />
+    <!--<button class="slds-button slds-button_brand" onclick="{!c.saveData}">Save</button>-->
+</aura:component>

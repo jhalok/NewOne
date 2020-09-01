@@ -1,0 +1,65 @@
+<aura:component controller="ACE_Assignagent" implements="force:appHostable,lightning:isUrlAddressable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>  
+    <aura:attribute name="userMap" type="Map"/>
+    <aura:attribute name="acName" type="String"/>
+    <aura:attribute name="listSearchDeaer" type="list"/>
+    <aura:attribute name="accountList" type="Account[]"/>
+    <aura:method name="refresh" action="{!c.handleKeyUp}"/>
+    <div style="height: auto;width:100%;background: #ffffff;padding-bottom: 50px;">
+        <Lightning:card title="Assign Agent" class="cardData">
+            <lightning:select aura:id="userPicklist" onchange="{!c.handleCompanyOnChange}"  name="Agent List" label="Agent List" required="true">
+                <option value="">--None--</option>
+                <aura:iteration items="{!v.userMap}" var="user" indexVar="key">
+                    <option text="{!user.value}" value="{!user.key}"/>
+                </aura:iteration>
+            </lightning:select>
+            <table class="tableStyle">
+                <aura:iteration items="{!v.listSearchDeaer}" var="item" indexVar="index">
+                    <tr>
+                        <td>
+                            <div onkeyup="{! c.handleKeyUp }">
+                                <lightning:input aura:id="enter-search" name="enter-search" label="Search Dealers" placeholder="Enter Dealer Name" class="searchDeareInput" type="search" value="{!v.acName}"/>
+                            </div>
+                        </td>
+                        <td class="deleteSection">
+                            <a onclick="{!c.delSingleRow}" id="{!index}"  >
+                                <lightning:icon variant="error" iconName="utility:delete" class="slds-icon slds-icon_small" size="small" alternativeText="icon"/>
+                                <span class="slds-assistive-text">Delete Icon</span>
+                            </a>
+                        </td>
+                    </tr>
+                </aura:iteration>
+            </table>
+            <lightning:button class="addButton" variant="brand" label="Add" title="Add" onclick="{! c.addSearchSection }" />
+            <lightning:button class="" variant="brand" label="Save Assignment" title="Save Assignment" onclick="{! c.addSearchSection }" />
+
+            <aura:if isTrue="{!v.accountList.length > 0}">
+                <div class="slds-p-top_medium">
+                    <table class="slds-table slds-table_cell-buffer slds-no-row-hover slds-table_bordered slds-table_fixed-layout tableStyle" role="grid">
+                        <thead>
+                            <tr class="slds-line-height_reset">
+                                <th class="" scope="col">
+                                    <div class="slds-truncate" title="Dealer Name">Dealer Name</div>
+                                </th>
+                                <th class="" scope="col">
+                                    <div class="slds-truncate" title="Assignment">Assignment</div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <aura:iteration items="{!v.accountList}" var="ac" indexVar="key">
+                                
+                                <tr>
+                                    <td>{!ac.Name}</td>
+                                    <td>    
+                                        <lightning:button variant="brand" value="{!ac.Id}" label="Assign" title="Assign" onclick="{! c.assignUserID }"/>
+                                    </td>
+                                </tr>
+                            </aura:iteration>
+                        </tbody>
+                    </table>
+                </div>
+            </aura:if>
+        </Lightning:card>
+    </div>
+</aura:component>

@@ -1,0 +1,4 @@
+<aura:component >
+    <button class="slds-button slds-button_destructive">SUBMIT</button>
+    <button class="slds-button slds-button_destructive">RESET</button>
+</aura:component>

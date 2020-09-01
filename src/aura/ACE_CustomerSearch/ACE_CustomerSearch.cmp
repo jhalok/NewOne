@@ -1,0 +1,41 @@
+<aura:component Controller="ACE_CustomerSearch_Controller" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    
+    <aura:attribute name="searchText" type="String" default=""/>
+    <aura:attribute type="list" name="recordList" />
+    <aura:attribute name="Label" type="String"/>
+    <aura:attribute name="required" type="Boolean" default="true"/>
+    
+    <!--Added by Sanchayan...Start-->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" description="Init page load"/>
+    <!--Added by Sanchayan...End-->
+    
+    <lightning:card iconName="utility:search" title="Global Search"> 
+        
+        <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon slds-input-has-icon_left-right" role="none">
+            <lightning:layoutItem size="4" padding="around-small">
+                <lightning:input required="{!v.required}" aura:id="userinput" label="Mobile/Phone" 
+                                 name="searchText" onchange="{! c.handleClick }" 
+                                 value="{!v.searchText}" class="leftspace" maxlength="10" /> 
+            </lightning:layoutItem>
+            <span class="slds-icon_container slds-icon-utility-search slds-input__icon slds-input__icon_right iconheight">    
+                <!--  <lightning:icon class="slds-icon slds-icon slds-icon_small slds-icon-text-default" iconName="utility:search" size="x-small" alternativeText="icon" />-->
+            </span> 
+        </div>
+        <!-- <aura:if isTrue="{!and(v.recordList.length == 0 , v.searchText)}">
+            No result found.-->
+        <br/>
+        <aura:if isTrue="{!and(v.recordList.length == 0 , v.searchText)}">
+            <div class="slds-notify_container slds-is-relative">
+                <div class="slds-notify slds-notify_toast slds-theme_error" role="alert">
+                    <div class="slds-notify__content">
+                        <h2 class="slds-text-heading_small">No Records Found...</h2>
+                    </div>
+                </div>
+            </div>
+            
+            <aura:set attribute="else">
+                <c:ACE_CustomerSearchResultList recordList="{!v.recordList}"/>
+            </aura:set>
+        </aura:if>
+    </lightning:card>
+</aura:component>

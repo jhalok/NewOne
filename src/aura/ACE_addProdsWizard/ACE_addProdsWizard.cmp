@@ -1,0 +1,82 @@
+<aura:component Controller="ACE_comWizardController"
+    implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction"
+    access="global">
+    <aura:attribute name="productInterests" type="List" />
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="picolumns" type="List" />
+    <aura:attribute name="leadRecord" type="Lead" />
+    <aura:attribute name="selectedProduct" type="string" />
+    <aura:attribute name="leadId" type="string" />
+    <aura:attribute name="newLeadIndex" type="Integer" />
+    <aura:attribute name="allExistingProducts" type="string[]" />
+    <aura:registerEvent name="interestList" type="c:getInterests" />
+    <aura:registerEvent name="modalClose" type="c:ACE_CloseParentFromChild"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:attribute name="showModal" type="boolean"/> 
+    <aura:attribute name="showSpinner" type="boolean" />
+    <aura:method name="refresh" action="{!c.doInit}" />
+    
+    <aura:registerEvent name="clsPopupEvent" type="c:ACE_CloseParentFromChild" />
+    <lightning:card>
+        <div class="slds-align_absolute-center slds-p-around_x-small">
+            <div class="slds-col slds-size_4-of-4">
+                <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                    <thead>
+                        <tr class="slds-text-title_caps">
+                            <th scope="col">
+                                <div class="" style="text-transform: capitalize;text-align:center;">S.No.</div>
+                            </th>
+
+                            <th scope="col">
+                                <div class="" style="text-transform: capitalize;text-align:center;"
+                                    title="Interested In">Interested In</div>
+                            </th>
+                           
+                            <th scope="col">
+                                <div class="slds-truncate" style="text-transform: capitalize;text-align:center;"
+                                    title=" Action	">Action</div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <aura:iteration items="{!v.productInterests}" var="item" indexVar="index">
+                            <tr class="slds-text-title_caps">
+                                <td style="    padding-top: 15px;text-align:center;">
+                                    {!index + 1}
+                                </td>
+                               
+                                <td data-label="Interested_In__c" scope="row" style="padding-top: 19px !important; ">
+                                    <c:ACE_lookupProdWizard objectName="Product2" fieldName="Name"
+                                        iconName="standard:product" placeholder="Product"
+                                        value="{!item.Product__c}" label="{!item.InterestName}" />
+                                        
+                                </td>
+                               
+                                <td style="padding-top: 15px;text-align:center;">
+                                    <a onclick="{!c.delSingleRow}" id="{!index}" style="float:left">
+                                        <lightning:icon variant="error" iconName="utility:delete"
+                                            class="slds-icon slds-icon_small" size="small" alternativeText="Delete Row" />
+                                        <span class="slds-assistive-text">Delete Icon</span>
+                                    </a>
+                                    <aura:if isTrue="{!index ==(v.productInterests.length-1)}">
+                                        <a onclick="{!c.addRowData}" id="{!indexnew}">
+                                            <lightning:icon variant="error" iconName="utility:add"
+                                                class="slds-icon slds-icon_small" size="small" alternativeText="Add More" />
+                                            <span class="slds-assistive-text">Add More</span>
+                                        </a>
+                                    </aura:if>
+                                </td>
+
+                            </tr>
+                        </aura:iteration>
+                    </tbody>
+                </table>
+                 <footer class="slds-modal__footer">
+                    <lightning:button label="Cancel" title="Cancel" onclick="{! c.closeModel}" />
+                 	<lightning:button variant="brand" label="Add Interests" title="Add Interests" onclick="{!c.saveData}"  />
+                 </footer>
+            </div>
+        </div>
+        
+    </lightning:card>
+</aura:component>

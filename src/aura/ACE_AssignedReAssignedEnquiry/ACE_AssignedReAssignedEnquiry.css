@@ -1,0 +1,41 @@
+.THIS .slds-tabs_default__link, .THIS .slds-tabs--default__link {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: block;
+    text-decoration: none;
+    cursor: pointer;
+    height: 2.5rem;
+    line-height: 2.5rem;
+    color: currentColor;
+    /*border: 1px solid #ddd7d7;*/
+    text-transform: inherit;
+    z-index: 1;
+    padding: 0px 35px 0px 35px;
+    text-decoration: none;
+    background-color: #cad5df;
+}
+.THIS .slds-tabs_default__item{
+     padding: 0 .75rem !important;
+    margin-bottom: -1px !important;
+}
+.THIS .slds-tabs_default__nav,.THIS .slds-tabs--default__nav {
+    display: flex;
+    align-items: flex-start;
+    border-bottom: 1px solid rgb(217, 219, 221);
+    padding: 20px 0px 0px 0px;
+}
+.THIS .slds-tabs_default__item.slds-active:after,.THIS .slds-tabs_default__item.slds-is-active:after,.THIS .slds-tabs--default__item.slds-active:after,.THIS .slds-tabs--default__item.slds-is-active:after {
+    background-color: white;
+    height: .1875rem;
+}
+.THIS .slds-tabs_default__link[tabindex="0"]:focus{
+    text-decoration: none;
+}
+.THIS .slds-radio{
+    display : inline-block !important;
+}
+.THIS .modalDiv{
+    margin: 2rem;
+}

@@ -1,0 +1,63 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:attribute name="options" type="List" default="[
+    {'label': 'YES', 'value': 'option1'},
+    {'label': 'No', 'value': 'option2'}
+    ]"/>
+    <aura:attribute name="value" type="String" default=""/>
+    
+    <div class="slds-page-header">
+    <p class="slds-text-heading--label" align="center"><b>Employee Contact Form </b></p>
+     </div>
+   
+
+    <div class="slds-grid slds-wrap">
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12 slds-large-size_6-of-12">
+            <lightning:select name="Salutation" label="Salutation" >
+                <option value="">choose one...</option>
+                <option value="1">Mr.</option>
+                <option value="2">Mrs.</option>
+                <option value="3">Miss.</option>
+            </lightning:select>
+        </div>
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12 slds-large-size_6-of-12">
+            
+            <lightning:input name="EmployeeId" label="Employee Id" />
+       
+        </div>
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12 slds-large-size_6-of-12">
+            <lightning:input name="Name" label="Name" />
+        </div>
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12 slds-large-size_6-of-12">
+            <lightning:input type="tel" name="MobileNumber" label="Mobile Number" />
+        </div>
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12 slds-large-size_6-of-12">
+            <lightning:input type="email" name="Email" label="Email" />
+        </div>
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12 slds-large-size_6-of-12">
+        </div> 
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12 slds-large-size_6-of-12">
+  		<lightning:textarea name="input1" label="Mailing Street" />       
+        </div>
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12 slds-large-size_6-of-12">
+            <lightning:input type="text" name="mailingCity" label="Mailing City" />
+        </div>
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12 slds-large-size_6-of-12">
+            <lightning:input type="text" name="mailingState" label="Mailing State/Province" />
+        </div>
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12 slds-large-size_6-of-12">
+            <lightning:input type="number" name="mailingCity" label="Mailing Zip/Postal Code" />
+        </div>
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12 slds-large-size_6-of-12">
+            <lightning:input type="text" name="mailingCountry" label="Mailing Country" />
+        </div>
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12 slds-large-size_6-of-12">
+        
+    <lightning:radioGroup name="radioGroupRequired"
+                          label="Do you own a Mahindra vehicle?"
+                          options="{! v.options }"
+                          value="{! v.value }"
+                          type="radio"
+                          required="true"/>
+        </div>
+    </div>
+</aura:component>

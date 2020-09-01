@@ -1,0 +1,179 @@
+<aura:component controller="ACE_LeadAPIService" implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:attribute name="progress" type="Integer" default="0"/>
+    <aura:attribute name="failedRecords" type="List"></aura:attribute>
+    <aura:attribute name="leadReport" type="object"/>
+    <aura:attribute name="pageSize" type="Integer" default="10" />
+    <aura:attribute name="currentPageNum" type="Integer" default="1" />
+    <aura:attribute name="paginatedList" type="list" />
+    <aura:attribute name="lastPageNum" type="Integer" default="0" />    
+    <aura:attribute name="recordsToShow" type="list" />
+    <aura:attribute name="showSpinner" type="boolean" default="false"/>
+    <!--*******SECOND TABLE ATTRIBUTES*******-->
+    <aura:attribute name="responseHeader" type="List"/>
+    <aura:attribute name="responseToshow" type="List" />
+    <aura:attribute name="respCurrentPageNum" type="Integer" default="1" />
+    <aura:attribute name="resplastPageNum" type="Integer" default="0" />
+    <aura:attribute name="respListOfList" type="list"/>
+    <aura:attribute name="showDetail" type="Boolean" default="false" />
+    <aura:attribute name="allRespRows" type="list" />
+    <aura:attribute name="listToInsert" type="list" />
+    <aura:attribute name="chunkNum" type="Integer" default="1" />
+    <aura:attribute name="activeSections" type="List" default="['A']" /> 
+    
+    <div class="slds-p-around_medium">
+        <div style="margin:auto;width: fit-content;margin-bottom:10px;">
+            <lightning:button label="Download Sample File" iconName="utility:download" iconPosition="left" variant="brand" onclick="{!c.getSampleFile}"/>
+        </div>
+        <div  class="slds-p-around_medium slds-file-selector__dropzone slds-size_1-of-4 slds-align_absolute-center" > 
+            <input title ="Choose File or Drag and Drop File" type="file" class="file" aura:id="file" onchange="{! c.processRecords }"/>
+        </div>
+    </div>
+    
+    
+    <lightning:accordion
+                         allowMultipleSectionsOpen="true"
+                         onsectiontoggle="{! c.handleSectionToggle }"
+                         activeSectionName="{! v.activeSections }">
+        <lightning:accordionSection name="A" label=" Processd records">
+            <aura:set attribute="body">
+                <aura:if isTrue="{!v.recordsToShow.length > 0}">
+                    <div Class="inputLimit" style="Display:flex; margin:-5px 1% 1% 1%;" >
+                        <div style="margin:auto;">
+                            <lightning:button label="Error Items" iconName="utility:download" iconPosition="left" variant="brand" onclick="{!c.getErrorItems}"/>
+                            <lightning:button variant="brand" label="Create Validated Record" onclick="{!c.createRecords}"/>
+                        </div>
+                    </div>
+                    <div class="displayBar" >
+                        <lightning:icon iconName="utility:warning" alternativeText="Warning!" variant="warning" size="x-small"/> Error Record Table
+                    </div>
+                    <!--<h1 style="color:red">Duplicates found:The following records cannot be inserted</h1>-->
+                    <div class="slds-p-around_small " style="overflow-y: scroll;max-height: 400px;">                
+                        <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-table_col-bordered">                    
+                            <thead>                        
+                                <aura:iteration items="{!v.leadReport.headers}" var="header">                            
+                                    <th>{!header}</th>                            
+                                </aura:iteration>
+                            </thead>
+                            <tbody >
+                                <aura:iteration items="{!v.recordsToShow}" var="row">
+                                    <tr>
+                                        <aura:iteration items="{!row.leadRec}" var="rec">
+                                            <!--<td><lightning:input class="{! 'removeLabel ' + (rec.validated == false ? 'invalidData' : '')}" type="text" value="{!rec.fieldData}"/></td>-->
+                                            <td title="{!rec.ErrorDetail}" class="{!(rec.validated == false ? 'invalidData' : '')}"> {!rec.fieldData} </td>
+                                        </aura:iteration>
+                                    </tr>            
+                                </aura:iteration>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div Class="inputLimit" style="Display:flex; margin:1%;" >
+                        <div>
+                            <lightning:select  aura:id="select" name="selectSize" onchange="{! c.changelistSize }" >
+                                <option value="10">10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                            </lightning:select>
+                        </div>
+                        <div style="margin:auto;">
+                            <lightning:button variant="brand" label="◄" disabled="{!v.currentPageNum == 1 ? 'true' : 'false'}"  onclick="{! c.firstPage }" />
+                            <lightning:button variant="brand" label="Previous" disabled="{!v.currentPageNum == 1 ? 'true' : 'false'}"  onclick="{! c.previousPage }" />
+                            <lightning:button variant="brand" label="Next" disabled="{!v.currentPageNum == v.lastPageNum  ? 'true' : 'false'}"  onclick="{! c.nextPage }" />
+                            <lightning:button variant="brand" label="►" disabled="{!v.currentPageNum == v.lastPageNum  ? 'true' : 'false'}" onclick="{! c.lastPage }" />
+                        </div>
+                        <div style="padding-top: 8px;" >
+                            
+                        </div>
+                    </div>
+                </aura:if>
+            </aura:set>
+        </lightning:accordionSection>
+        <lightning:accordionSection name="B" label="Response table">
+            <!--****************************************************Response Table******************************************************-->
+            <aura:if isTrue="{!v.responseToshow.length > 0}">
+                <div class="displayBar" >
+                    <lightning:icon iconName="utility:work_order_type" alternativeText="Warning!" variant="warning" size="x-small"/> Response Table
+                </div>
+                <div class="slds-p-around_small " style="overflow-y: scroll;max-height: 400px;border: 2px solid;">                
+                    <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-table_col-bordered">                    
+                        <thead>                        
+                            <aura:iteration items="{!v.responseHeader}" var="header">                            
+                                <th style="{!(header=='Status' ? 'width:100px' : '')}">{!header}</th>                            
+                            </aura:iteration>
+                        </thead>
+                        <tbody >
+                            <aura:iteration items="{!v.responseToshow}" var="row">
+                                <tr>
+                                    <aura:iteration items="{!row}" var="rec" indexVar="index">
+                                        <!--aura:if isTrue="{!(rec.status == 'Success' || rec.status == 'Already Exsits')}"-->
+                                        <aura:if isTrue="{!(index == 0)}">
+                                            <td style="padding:0px;">
+                                                <table class="innerTable">
+                                                    <th></th>
+                                                    <th><b>Status</b></th>
+                                                    <th><b>Exceptions</b></th>
+                                                    <tr><td> Lead </td><td> {!rec.leadStatus}</td><td>{!rec.leadExcetion} </td></tr>
+                                                    <tr><td> Product Interest </td><td> {!rec.relatedProductInterests[0].productInterestStatus} </td><td> {!rec.relatedProductInterests[0].productInterestExcetion} </td></tr>
+                                                    <tr><td> Source Tracker </td><td> {!rec.relatedProductInterests[0].relatedSourceTrackers[0].sourceTrackerStatus} </td><td> {!rec.relatedProductInterests[0].relatedSourceTrackers[0].sourceTrackerExcetion} </td></tr>
+                                                </table>
+                                            </td>
+                                            <aura:set attribute="else">
+                                                <td > {!rec} </td>
+                                            </aura:set>
+                                        </aura:if>
+                                    </aura:iteration> 
+                                </tr>            
+                            </aura:iteration>
+                        </tbody>
+                    </table>
+                </div>
+                <!--******NAvigation Buttons************-->
+                <div Class="inputLimit" style="Display:flex; margin:1%;" >
+                    <div>
+                        <lightning:select  aura:id="selectresp" name="selectSize" onchange="{! c.respchangelistSize }" >
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                        </lightning:select>
+                    </div>
+                    <div style="margin:auto;">
+                        <lightning:button variant="brand" label="◄" disabled="{!v.respCurrentPageNum == 1 ? 'true' : 'false'}"  onclick="{! c.respFirstPage }" />
+                        <lightning:button variant="brand" label="Previous" disabled="{!v.respCurrentPageNum == 1 ? 'true' : 'false'}"  onclick="{! c.respPreviousPage }" />
+                        <lightning:button variant="brand" label="Next" disabled="{!v.respCurrentPageNum == v.resplastPageNum  ? 'true' : 'false'}"  onclick="{! c.respNextPage }" />
+                        <lightning:button variant="brand" label="►" disabled="{!v.respCurrentPageNum == v.resplastPageNum  ? 'true' : 'false'}" onclick="{! c.respLastPage }" />
+                    </div>
+                    <div style="padding-top: 8px;" >
+                        
+                    </div>
+                </div>
+            </aura:if>
+        </lightning:accordionSection>
+    </lightning:accordion>
+    
+    
+    
+    
+    <!--<aura:if isTrue="{!v.isLoading}">-->
+    <lightning:spinner alternativeText="Loading" size="large" aura:id="spinner" class="slds-hide"/>
+    <!--</aura:if>-->
+    <aura:if isTrue="{!v.showDetail}">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close">
+                        
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">Modal Header</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    
+                </div>
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_neutral" onclick="{!c.closePopup}">Close</button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+    
+</aura:component>

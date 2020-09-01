@@ -1,0 +1,133 @@
+<aura:component controller="ACE_LeadRelatedList_Controller" implements="force:lightningQuickActionWithoutHeader,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId" access="global" >
+    
+    <aura:attribute name="ProductList" type="Product2[]" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:registerEvent name="clsPopupEventNewLead" type="c:ACE_CloseParentFromChild"/>
+    
+    <aura:html tag="style">
+        .cuf-content {
+            padding: 0 0rem !important;
+        }
+               
+        .slds-modal__content{
+            overflow-y:hidden !important;
+            height:unset !important;
+            max-height:unset !important;
+        }
+        .slds-modal__container{
+            width:100%;
+            padding:0px !important;
+        }
+    </aura:html>
+    <!--<section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">-->
+        <lightning:navigation aura:id="navService"/>
+        <div class="slds-modal__container">
+            <!-- Modal/Popup Box Header Starts here-->
+            <header class="slds-modal__header">
+            <!-- <lightning:buttonIcon iconName="utility:close"
+                                    onclick="{! c.closeModel }"
+                                    alternativeText="close"
+                                    variant="bare-inverse"
+                                    class="slds-modal__close"/>-->
+                <h2 id="modal-heading-01" class="slds-text-heading_large slds-hyphenate">New Lead</h2>
+            </header>
+            <!--Modal/Popup Box Body Starts here-->
+            <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                <p><b> 
+                        <lightning:recordEditForm recordId="{!v.recordId}" objectApiName="Contact">
+                        <!-- <div class="slds-grid slds-gutters  slds-p-around_medium">
+                                <div class="slds-col slds-size_1-of-1">
+                                    <lightning:inputField fieldName="Name" disabled="true"   />
+                                </div>
+                            </div>
+                            
+                            <div class="slds-grid slds-gutters  slds-p-around_medium">
+                                <div class ="slds-col slds-size_1-of-1">
+                                    <lightning:inputField fieldName="MobilePhone" disabled="true" />
+                                </div>
+                                
+                            </div>
+                            
+                            <div class="slds-grid slds-gutters slds-p-around_medium">
+                                <div class="slds-col slds-size_1-of-1">
+                                    <lightning:inputField fieldName="Email" disabled="true" />
+                                </div>
+                            </div>
+                            
+                            <div class="slds-grid slds-gutters slds-p-around_medium"> 
+                                <div class="slds-col slds-size_1-of-1">
+                                    <lightning:inputField fieldName="MailingAddress" disabled="true"/>
+                                </div>
+                            </div>
+                            -->
+                            <table class="slds-table slds-table_bordered slds-table_cell-buffer"> 
+                                <thead>
+                                    <tr class="slds-text-title_caps">
+                                        <th scope="col">
+                                            <div class="" style="text-transform: capitalize;text-align:center;">Sr.No.</div>
+                                        </th>
+                                        
+                                        <th scope="col">
+                                            <div class="" style="text-transform: capitalize;text-align:center;" title="Interested In">Interested In</div>
+                                        </th>
+                                        
+                                        <th scope="col">
+                                            <div class="slds-truncate" style="text-transform: capitalize;text-align:center;" title=" Action	">Delete	</div>
+                                        </th>
+                                    </tr>
+                                </thead>   
+                                <tbody>
+                                    <aura:iteration items="{!v.ProductList}" var="item" indexVar="index">
+                                        <tr class="slds-text-title_caps" >         
+                                            <td style="    padding-top: 15px;text-align:center;">
+                                                {!index + 1}
+                                            </td>
+                                            
+                                            <td data-label="Interested_In__c" scope="row" style="padding-top: 19px !important; ">
+                                                <c:ACE_CustomLookup aura:id="ccustomlookup" objectName="Product2" fieldName="Name"  iconName="standard:product" placeholder="Enter Vehicle" value="{!item.Interested_In__c}" />
+                                            </td>
+                                            
+                                            <td style="padding-top: 15px;text-align:center;">
+                                                <a onclick="{!c.delSingleRow}" id="{!index}" >
+                                                    <lightning:icon variant="error" iconName="utility:delete" class="slds-icon slds-icon_small" size="small" alternativeText="icon"/>
+                                                    <span class="slds-assistive-text">Delete Icon</span>
+                                                </a>
+                                                <aura:if isTrue="{!index ==(v.ProductList.length-1)}">
+                                                    <a onclick="{!c.addRowData}" id="{!indexnew}">
+                                                        <lightning:icon variant="error" iconName="utility:add"
+                                                            class="slds-icon slds-icon_small" size="small" alternativeText="Add More" />
+                                                        <span class="slds-assistive-text">Add More</span>
+                                                    </a>
+                                                </aura:if>
+                                            </td> 
+                                            
+                                        </tr>
+                                    </aura:iteration>
+                                </tbody>
+                            </table>
+                            
+                           <!-- <div style="float: right !important;margin-top: 15px !important;">
+                                <lightning:button  aura:id="buttonid"   label="Add More" onclick="{!c.addRowData}" variant="brand"  />
+                            </div>
+                            
+                         <div style="float: left !important;margin-top: 15px !important;">
+                                <lightning:button  aura:id="buttonid"   label="Save" onclick="{!c.saveData}" variant="brand"  />
+                            </div>-->
+                        </lightning:recordEditForm>
+                    </b>
+                </p>
+            </div>
+            <!--Modal/Popup Box Footer Starts here-->
+            <footer class="slds-modal__footer">
+                <lightning:button variant="brand"
+                                label="Cancel"
+                                title="Cancel"
+                                onclick="{! c.closeModel }"/>
+                <lightning:button variant="brand"
+                                label="Save"
+                                title="Save"
+                                onclick="{!c.saveData}"/>
+            </footer>
+        </div>
+    <!--</section>-->
+</aura:component>

@@ -1,0 +1,105 @@
+<aura:component controller="ACE_Enquiry_ScheduleTestDrive_Controller" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader" access="global">
+
+    <aura:attribute name="onFirstStep" type="boolean" default='true' />
+    <aura:attribute name="onLastStep" type="boolean" default='false' />
+    <aura:attribute name="onSecStep" type="boolean" default='false' />
+    <aura:attribute name="Models" type="Model__c[]" />
+    <aura:attribute name="modelName" type="String"  />
+    <aura:attribute name="OppRecord" type="Lead"  />
+    <aura:attribute name="DealerData" type="Account"  />
+    
+    <aura:attribute name="url" type="String"  />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
+    <aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/>
+    <aura:registerEvent name="clsPopupEventCTD" type="c:ACE_CloseParentFromChild" />
+    <!--Edited by krishnan -->
+    <aura:attribute name="recordId" type="String" />
+    <!-- <div class="container">-->
+    <aura:html tag="style">
+        .slds-modal__container {
+        width : 70% !important;
+        max-width: unset !important;
+        }
+        .Previous {
+        margin-top: 15px !important;
+        }
+        .Next {
+        margin-top: 15px !important;
+        }
+        .iconPrevious {
+        float:left;
+        margin-bottom:6px;
+        width: 45px;
+        color: white !important;
+        background-color: #e53144;
+        }
+        .iconNext {
+        float:right;
+        margin-bottom:6px;
+        width: 45px;
+        color: white !important;
+        background-color: #e53144;
+        }
+    </aura:html>
+    <div class="exampleHolder">
+        <lightning:spinner aura:id="mySpinner" class="slds-hide"/>
+    </div>
+    <div class="c-container" style="vertical-align:middle;">
+        <lightning:layout horizontalAlign="space" verticalAlign="center">
+            
+            <lightning:layoutItem size="1">
+                <aura:if isTrue="{!!v.onFirstStep}">
+                    <lightning:buttonIcon iconName="utility:back" variant="error" size="x-large" class="iconPrevious" alternativeText="Previous" onclick="{! c.goPrevious }"/>
+                    <!--<lightning:button variant="brand" label="Previous " class="Previous" title="Previous" onclick="{! c.goPrevious }" />-->
+                </aura:if>
+            </lightning:layoutItem>
+            
+            <lightning:layoutItem size="10">
+                <div>
+                    <aura:if isTrue="{!v.onFirstStep}">
+                        <div style="min-height:80px;">
+                            <lightning:select name="select1" label="Select Model For Test Drive" value="{!v.modelName}" required="true">
+                                <option value="">choose one...</option>
+                                <aura:iteration items="{!v.OppRecord.lstOpp.OpportunityLineItems}" var="item">
+                                    <option value="{!item.product2.Id}">{!item.Product2.Name}</option>
+                                </aura:iteration>
+                            </lightning:select>
+                        </div>
+                    </aura:if>
+                    
+                    <aura:if isTrue="{!v.onSecStep}">
+                        <h5>Model : {!v.modelName}</h5>
+                        <br/>
+                        <iframe src="{!v.url}" height="300px" style="border:0px; width:100%;" onload="{!c.hideSpinner}"/>
+                    </aura:if>
+                    
+                    <aura:if isTrue="{!v.onLastStep}">
+                        <ul class="slds-list_horizontal slds-has-block-links_space">
+                            <li><h5>Model : {!v.modelName}</h5></li>
+                            <li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</li>
+                            <li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</li>
+                            <li><h5>City : {!v.OppRecord.City}</h5></li>
+                        </ul>
+                        <c:scheduleTestDrive></c:scheduleTestDrive	>
+                    </aura:if>
+                </div>
+            </lightning:layoutItem>
+            
+            <lightning:layoutItem size="1">
+                <aura:if isTrue="{!!v.onLastStep}">
+                    <lightning:buttonIcon iconName="utility:forward" variant="error" size="x-large" class="iconNext" alternativeText="Next" onclick="{! c.goNext }"/>
+                    <!--<lightning:button variant="brand" label="Next" title="Next" class="Next" onclick="{! c.goNext }" />-->
+                </aura:if>
+            </lightning:layoutItem>
+        </lightning:layout>
+    </div>
+    
+    <footer class="slds-modal__footer">
+        <button class="slds-button slds-button_brand" onclick="{! c.cancelAction}">Cancel</button>
+        <aura:if isTrue="{!v.onLastStep}">
+            <lightning:button variant="brand" label="Save" title="Save" onclick="{!c.saveData}"/>
+        </aura:if>
+    </footer>
+    
+</aura:component>

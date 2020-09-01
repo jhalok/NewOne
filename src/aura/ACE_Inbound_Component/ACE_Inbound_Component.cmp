@@ -1,0 +1,117 @@
+<aura:component controller="ACE_CreateLeadController" implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" access="global" >
+    
+    
+    <aura:attribute name="relatedContactDetails" type="Map" default="{'Id':'','Name':''}"/>
+    <aura:attribute name="relatedLeadDetails" type="Map" default="{'Id':'','Name':''}"/>
+
+  	<aura:attribute name="callType" type="String" default=""/>
+    <aura:attribute name="FirstName" type="String" />
+    <aura:attribute name="LastName" type="String" />
+    <aura:attribute name="MobilePhone" type="String"  />
+    <aura:attribute name="City" type="String" />
+    <aura:attribute name="comment" type="String" />
+    <aura:attribute name="email" type="String" />
+    <aura:attribute name="leadId" type="String" />
+
+
+    <!--Added by Sanchayan...Start-->
+    <aura:attribute name="hdrName" type="String" default="Caller Details"/>
+    <aura:attribute name="iconName" type="String" default="custom:custom22"/>
+    <aura:attribute name="showCompFlag" type="Boolean" default="false"/>
+    <aura:attribute name="linkSObjName" type="String" default=""/>
+    <aura:attribute name="linkSObjRecId" type="Id" />
+    <aura:attribute name="linkSObjRecName" type="String" default=""/>
+   
+    <aura:attribute name="interestsForLead" type="List" />
+    <aura:attribute name="isUpdateProductInterestOpen" type="Boolean" default="false"/>
+    <lightning:workspaceAPI aura:id="workspace"/>
+
+    <lightning:empApi aura:id="empApi"/>
+    <aura:handler name="interestList" event="c:getInterests" action="{!c.getInterestList}" />
+    <aura:handler name="modalClose" event="c:ACE_CloseParentFromChild" action="{!c.closeUpdateProductInterestModel}"/>
+    <aura:handler  event="c:ACE_LinkSObjectEvent" action="{!c.fetchRelatedContact}"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" description="Init page load"/>
+   
+    <!--Added by Sanchayan...END-->
+   <lightning:card title="{!v.hdrName}"  iconName="{!v.iconName}">
+        <div class="slds-grid slds-wrap">
+            <div class="slds-size_1-of-2" >
+                <lightning:input class="slds-m-around_x-small" aura:id="CustomerField" type="tel" name="MobileNumber" label="Mobile No." value="{!v.MobilePhone}" disabled= "{!!v.showCompFlag}" />
+            </div>
+            <div class="slds-size_1-of-2" >
+                <lightning:input class="slds-m-around_x-small" aura:id="CustomerField" type="email" name="Email" label="Email" value="{!v.email}" />
+            </div>
+            <div class="slds-size_1-of-2" >
+                <lightning:input class="slds-m-around_x-small" aura:id="CustomerField" name="FirstName" label="First Name" value="{!v.FirstName}"  />
+            </div>
+            <div class="slds-size_1-of-2" >
+                 <lightning:input class="slds-m-around_x-small" aura:id="CustomerField" name="LastName" label="Last Name" value="{!v.LastName}" />
+            </div>
+            <div class="slds-size_1-of-2" >
+                <lightning:input class="slds-m-around_x-small" aura:id="CustomerField" name="City" label="City" value="{!v.City}" />
+            </div>
+            <!--Added by Sanchayan...Start-->
+            <aura:if isTrue="{!v.showCompFlag}">
+                <div class="slds-size_1-of-2" style="display:none;">
+                    <lightning:input class="slds-m-around_x-small" aura:id="CustomerField" name="Company" label="Company" value="{!v.NewCustomer.Company}" />
+                </div>
+                <div class="slds-size_1-of-2" style="display:none;">
+                    <lightning:input class="slds-m-around_x-small" aura:id="CustomerField" name="ChatId" label="ChatId" value="{!v.NewCustomer.chatId}" disabled="true"/>
+                </div>
+            </aura:if>
+            <!--Added by Sanchayan...End-->
+            <div class="slds-size_1-of-2" >
+                <lightning:input class="slds-m-around_x-small" aura:id="CustomerField" name="LinkedContact" label="Linked Contact" value="{!v.relatedContactDetails.Name}" disabled="true"/>
+            </div>
+            <div class="slds-size_1-of-2" >
+                <lightning:textarea class="slds-m-around_x-small" aura:id="CustomerField" name="Comments" label="Comments" value="{!v.comment}"/>
+            </div>
+            <div class="slds-size_1-of-2" >
+                <lightning:input class="slds-m-around_x-small" aura:id="CustomerField" name="LinkedLead" label="Linked Lead" value="{!v.relatedLeadDetails.Name}" disabled="true"/>
+            </div>
+            <div class="slds-size_1-of-2 interestButton" >
+                <lightning:button variant="brand"
+                label="Product Interest"
+                title="Product Interest"
+                onclick="{!c.openPIModal}"/>
+            </div>
+        </div>
+        <lightning:navigation aura:id="navLink"/>
+        <div class="slds-p-around_medium">
+            <lightning:button  aura:id="customerField"  label="Create Lead" onclick="{!c.SaveLead}" variant="brand" />
+            <lightning:button  aura:id="customerField"  label="Create Case" onclick="{!c.SaveCase}" variant="brand"  />
+            <aura:if isTrue="{!v.showCompFlag &amp;&amp; v.linkSObjRecId!=null &amp;&amp; v.linkSObjRecId!=''}">
+                <div style="float:right;margin-right:10px;">
+                    <strong >Linked {!v.linkSObjName} : </strong>
+                    <lightning:button label="{!v.linkSObjRecName}" onclick="{!c.openLinkedRecordTab}" variant="base"/>
+                    <!--ui:outputURL value="{!'/lightning/r/'+v.linkSObjName+'/'+v.linkSObjRecId+'/view'}" label="{!v.linkSObjRecName}" /-->
+                <lightning:buttonIcon iconName="utility:ban" onclick="{!c.deLinkItem}"
+                                         alternativeText="{!'De-Link '+v.linkSObjName}" variant="bare"/>
+                </div>
+            </aura:if>
+        </div>
+        
+        <aura:if isTrue="{!v.isUpdateProductInterestOpen}">
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <!-- Modal/Popup Box Header Starts here-->
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close"
+                                            onclick="{! c.closeUpdateProductInterestModel }"
+                                            alternativeText="close"
+                                            variant="bare-inverse"
+                                            class="slds-modal__close"/>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Update Product Interest</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <c:ACE_Product_Interest_Prioritization leadId="new" aura:id="cPIComponent"></c:ACE_Product_Interest_Prioritization>
+                    </div>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </aura:if> 
+
+    </lightning:card>
+     
+    
+</aura:component>

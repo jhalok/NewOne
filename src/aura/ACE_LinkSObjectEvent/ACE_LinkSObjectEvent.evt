@@ -1,0 +1,6 @@
+<aura:event type="APPLICATION" description="Event to link existing Sobject to new records creation form" >
+    <aura:attribute name="sObjectName" type="String"/>
+    <aura:attribute name="sObjRecId" type="Id"/>
+    <aura:attribute name="sObjRecName" type="String"/>
+    
+</aura:event>

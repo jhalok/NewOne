@@ -1,0 +1,4 @@
+<aura:component implements="lightning:actionOverride,forceCommunity:availableForAllPageTypes,force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId,force:lightningQuickAction"
+    access="global">
+
+</aura:component>

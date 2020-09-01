@@ -1,0 +1,5 @@
+<aura:component controller="ACE_Assignagent" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+	<Lightning:card title="Assign Agent">
+    
+    </Lightning:card>
+</aura:component>

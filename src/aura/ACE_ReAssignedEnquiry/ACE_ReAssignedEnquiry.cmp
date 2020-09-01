@@ -1,0 +1,169 @@
+<aura:component controller="ACE_leadlist"
+    implements="forceCommunity:availableForAllPageTypes,force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId,force:lightningQuickAction"
+    access="global">
+    <aura:handler name="init" value="{!this}" action="{!c.doinit}" />
+    <aura:attribute name="oppList" type="list" />
+    <aura:attribute name="PageNumber" type="integer" default="1" />
+    <aura:attribute name="TotalPages" type="integer" default="0" />
+    <aura:attribute name="TotalRecords" type="integer" default="0" />
+    <aura:attribute name="RecordStart" type="integer" default="0" />
+    <aura:attribute name="RecordEnd" type="integer" default="0" />
+    <aura:attribute name ="pageSize" type="Integer" default="10" />
+    <aura:attribute name="rvpName" type="String" default="" />
+    <aura:attribute name="isEdit" type="boolean" />
+    <aura:attribute name="editAccId" type="id" />
+    <aura:attribute name="viewAccId" type="id" />
+    <aura:attribute name="isView" type="boolean" />
+    <aura:attribute name="isShow" type="boolean" />
+    <aura:attribute name="oppcount" type="integer" default="" />
+    <aura:attribute name="objectType" type="String" />
+    <aura:attribute name="launchType" type="String" />
+    <aura:attribute name="modelType" type="String" />
+    <aura:attribute name="modelData" type="List" />
+    <aura:attribute name="AllEnquiries" type="List" />
+    <aura:attribute name="AllLeads" type="List" />
+    
+    <aura:method name="handleClick" action="{!c.doinit}" />
+    
+    <aura:attribute name="Enquiry" type="Boolean" default="true" />
+      <aura:attribute name="options" type="List" default="[
+    {'label': '10', 'value': 10},
+    {'label': '15', 'value': 15},
+    {'label': '20', 'value': 20},
+    ]"/>
+    
+   
+    <div class="slds-grid slds-wrap slds-hide">
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_7-of-12 slds-large-size_9-of-12">
+        </div>
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12 slds-large-size_2-of-12">
+            <div class="">
+                <br />
+                
+            </div>
+        </div>
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-12 slds-large-size_1-of-12"></div>
+    </div>
+
+
+
+    <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+        <thead>
+            <tr class="slds-text-title_caps">
+                <th scope="col">
+                    <strong>
+                        <div class="slds-truncate Heading" title="Name">Name</div>
+                    </strong>
+                </th>
+              <!--  <th scope="col">
+                    <strong>
+                        <div class="slds-truncate Heading" title="Name">Sales Consultant</div>
+                    </strong>
+                </th> -->
+                <th scope="col">
+                    <strong>
+                        <div class="slds-truncate Heading" title="StageName">Product Model</div>
+                    </strong>
+                </th>
+                <th scope="col">
+                    <strong>
+                        <div class="slds-truncate Heading" title="StageName">Search Owner</div>
+                    </strong>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <aura:iteration items="{!v.oppList}" var="opp">
+                <tr>
+                    <th scope="row" data-label="Name">
+                        <b><a href="javascript:void(0)" onclick="{!c.view}" id="{!opp.Id}"
+                            style="color:#0e63ac;">{!opp.Name}</a></b>
+                        <div class="slds-truncate fontStyle" title="{!opp.Name}"></div>
+                    </th>
+                  <!--  <th scope="row" data-label="Sales Consultant">
+                        <aura:if isTrue="{!v.Enquiry}">
+                            <a href="javascript:void(0)" onclick="{!c.view}" id="{!opp.Id}"
+                                style="color:rgb(0,0,0)">{!opp.Contact__r.Name}</a>
+                            <div class="slds-truncate fontStyle" title="{!opp.Contact__r.Name}"></div>
+                            <aura:set attribute="else">
+                            <a href="javascript:void(0)" onclick="{!c.view}" id="{!opp.Id}"
+                                style="color:rgb(0,0,0)"></a>
+                            <div class="slds-truncate fontStyle" title="{!opp.Contact__r.Name}"></div>
+                            </aura:set>
+                        </aura:if>
+                    </th>-->
+                    <th scope="row" data-label="Product Name">
+                        <aura:if isTrue="{!v.Enquiry}">
+                            <aura:iteration items="{!opp.OpportunityLineItems}" var="oppline">
+                                <div class="slds-truncate" title="{oppline.Product2.Vehicle_Model__c}">
+                                    {!oppline.Product2.Vehicle_Model__c}</div>
+                            </aura:iteration>
+                            <aura:set attribute="else">
+                                <aura:iteration items="{!opp.Product_Interests__r}" var="oppline">
+                                    <div class="slds-truncate" title="{oppline.Product__r.Vehicle_Model__c}">
+                                        {!oppline.Product__r.Vehicle_Model__c}</div>
+                                </aura:iteration>
+                            </aura:set>
+                        </aura:if>
+                    </th>
+                
+                    <th>
+                        <c:PMA_searchUser selectedRecord="{!v.rvpName}" IconName="standard:User" objectAPIName="User"
+                            aura:id="{!opp.id}" objectType="{!v.objectType}"/>
+                    </th>
+                    <th>
+                        <button type="button" class="slds-button slds-button_brand ButtonProprty"
+                            onclick="{!c.handleSavePMAForm}" id="{!opp.Id}">Assign Owner</button>
+                    </th>
+                </tr>
+            </aura:iteration>
+        </tbody>
+    </table>
+
+   <div class="slds-clearfix">
+        <div class="slds-page-header" role="banner">
+            <p class="slds-float_left slds-page-header__title Heading">{!v.RecordStart}-{!v.RecordEnd} of
+                {!v.TotalRecords} | Page {!v.PageNumber} of {!v.TotalPages}</p>
+            <p class="slds-float_left" style="margin-left: 25rem;">
+                <lightning:button disabled="{!v.PageNumber == 1 || v.TotalRecords == 0 || v.TotalPages == 0}" variant="brand" aura:id="prevPage" label="Prev"
+                    onclick="{!c.handlePrev}" />
+                <lightning:button disabled="{!v.PageNumber == v.TotalPages || v.TotalRecords == 0 || v.TotalPages == 0}" aura:id="nextPage" variant="brand"
+                    label="Next" onclick="{!c.handleNext}" />
+            </p>
+            <p class="slds-float_right">
+                <lightning:combobox aura:id="pagesz" name="PageSize" label="Select PageSize" value="{!v.pageSize}"
+                    placeholder="{!v.pageSize}" options="{! v.options }" onchange="{! c.onSelectChange }" />
+            </p>
+        </div>
+    </div>
+    <aura:renderIf isTrue="{!v.isEdit}">
+        <center>
+            <ui:button label="Save" press="{!c.save}" />
+        </center>
+        <lightning:recordEditForm aura:id="edit" recordId="{!v.viewAccId}" />
+    </aura:renderIf>
+    <!--   <aura:renderIf isTrue="{!v.isView}">
+        <force:recordView aura:id="view" recordId="{!v.viewAccId}"/>
+    </aura:renderIf> -->
+
+    <aura:if isTrue="{!v.isView}">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+            aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close" onclick="{! c.closeModel }" alternativeText="close"
+                        variant="bare-inverse" class="slds-modal__close" />
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate"></h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <force:recordView aura:id="view" recordId="{!v.viewAccId}" />
+                    
+                </div>
+                <footer class="slds-modal__footer">
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+
+</aura:component>

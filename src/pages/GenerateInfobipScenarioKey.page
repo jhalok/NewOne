@@ -1,0 +1,6 @@
+<apex:page controller="GenerateInfobipScenarioKeyController">
+    <apex:form >
+        <apex:pageMessages id="pgmsg"/>
+        <apex:commandButton value="Get Scenario Key" action="{! doGetScenarioKey }" reRender="pgmsg"/>
+    </apex:form>
+</apex:page>

@@ -1,0 +1,479 @@
+<!--
+  Created By: Krishnan Mishra   <krishnan.mishra@in.pwc.com>
+
+    Purpose:  Generating Quote PDF for the corresponding quote on Enquiry object
+
+    Created:  30/10/2019
+
+    Changes: 06/11/2019: store pdf in files section.
+-->
+
+<apex:page standardController="Quote" extensions="QuotePDFController" showQuickActionVfHeader="false" applyBodyTag="false" 
+showHeader="false" sidebar="false" applyHtmlTag="false"  renderAs="Pdf" >
+
+    <head>
+        <style type="text/css" media="print">
+            @page {
+
+                @bottom-left {
+                    content: element(footer);
+                }
+            }
+
+            #quoteHeader {
+                text-align: center;
+                color: red;
+                font-size: 16px;
+                margin-top: 3%;
+            }
+
+            #quote {
+                margin-left: 2%;
+                font-size: 14px;
+            }
+
+            #dealerInfoHeader {
+                border-top: solid black 0.5px;
+                border-bottom: solid black 0.5px;
+                min-height: 25px;
+            }
+
+            #dealerInfoHeaderInner {
+                position: relative;
+                top: 5px;
+            }
+
+            .header {
+                background-color: red;
+                text-align: center;
+                min-height: 25px;
+            }
+
+            .headerInner {
+                position: relative;
+                top: 3px;
+                color: white;
+                font-size: 16px;
+            }
+
+            .quotationField {
+                position: relative;
+                top: 3px;
+                width: 15%;
+                font-weight: normal;
+                font-size: 12px;
+            }
+
+            .quotationValue {
+                position: relative;
+                top: 3px;
+                width: 20%;
+                font-weight: normal;
+                font-size: 12px;
+            }
+
+            .pricing {
+                position: relative;
+                top: 3px;
+                width: 10%;
+                font-weight: normal;
+            }
+
+            .amount {
+                width: 7%;
+                position: relative;
+                top: 3px;
+                font-weight: normal;
+            }
+
+            .price,
+            .priceValue {
+                border: 1px solid black;
+            }
+
+            .disclaimerText {
+                font-size: 16px;
+                text-align: left;
+            }
+
+            .TnCContent {
+                font-size: 11px;
+            }
+
+            .Disclaimer {
+                font-weight: bold;
+                font-size: 16px;
+                text-align: center;
+            }
+
+            .headerInnerDis {
+
+                color: Black;
+                font-size: 14px;
+            }
+
+            hr {
+                margin-top: -1px;
+                margin-bottom: 1px;
+            }
+
+            body {
+                border: solid black 2px;
+            }
+
+            div.footer {
+                display: block;
+                padding: 5px;
+                position: running(footer);
+            }
+
+            .pagenumber:before {
+                content: counter(page);
+            }
+
+            .pagecount:before {
+                content: counter(pages);
+            }
+        </style>
+    </head>
+    <div style="border:solid black 1px;">
+   
+        <div id="quoteHeader">
+            <h1>
+                {!Quote.Opportunity.Dealer__r.name}
+            </h1>
+            <h3 style="color:black;">
+                {!Quote.Opportunity.Dealer__r.BillingStreet} {!Quote.Opportunity.Dealer__r.BillingCity}, 
+                {!Quote.Opportunity.Dealer__r.BillingState} {!Quote.Opportunity.Dealer__r.BillingCountry}
+            </h3>
+
+        </div>
+        <br/>
+        <div id="quote">
+            <div id="dealerInfoHeader">
+                <div id="dealerInfoHeaderInner">
+                    <span id="dealerEmail" style="color:red;">
+                        Email:
+                    </span>
+                    <span>
+                        {!Quote.Opportunity.Owner.email}
+                    </span>
+                    <span style="float:right;margin-right:2%">
+                        {!Quote.Opportunity.Account.phone}
+                    </span>
+                    <span id="dealerPhone" style="color:red;float:right;">
+                        Phone:
+                    </span>
+                </div>
+            </div>
+            <br/>
+            <div class="header">
+                <h1 class="headerInner">
+                    Quotation
+                </h1>
+            </div>
+            <div id="quotationBody">
+                <table>
+                    <tr>
+                        <th class="quotationField">
+                            Sales Consultant Name
+                        </th>
+                        <th class="quotationValue">
+                            : {!Quote.Opportunity.Owner.name}
+                        </th>
+                        <th class="quotationField">
+                            Quotation Number
+                        </th>
+                        <th class="quotationValue">
+                            : {!Quote.QuoteNumber}
+                        </th>
+                    </tr>
+                    <tr>
+                        <th class="quotationField">
+                            Sales Consultant Mobile
+                        </th>
+                        <th class="quotationValue">
+                            : {!Quote.Opportunity.Owner.phone}
+                        </th>
+                        <th class="quotationField">
+                            Quotation Date
+                        </th>
+                        <th class="quotationValue">
+                            <apex:outputText value="{0, date, MMMM d','  yyyy}" >
+                                :
+                                <apex:param value="{!Quote.createdDate}" />
+                            </apex:outputText>
+                        </th>
+                    </tr>
+                    <apex:repeat value="{!products}" var="product" id="theRepeat">
+                        <apex:outputPanel rendered="{!IF(product.Type__c ='Vehicle' ,true,false)}">
+                        <tr>
+                            <th class="quotationField">
+                                Customer Name
+                            </th>
+                            <th class="quotationValue">
+                                : {!Quote.Account.name}
+                            </th>
+
+                            <!-- Enter Vehicle Model info -->
+
+                            <th class="quotationField">
+                                Vehicle Model
+                            </th>
+                            <th class="quotationValue">
+                                : {!product.vehicle_model__c}
+                            </th>
+                        </tr>
+                        <tr>
+                            <th class="quotationField">
+                                Customer Mobile
+                            </th>
+                            <th class="quotationValue">
+                                : {!Quote.Account.Phone}
+                            </th>
+
+                            <!-- Enter Vehicle Model info -->
+                            <th class="quotationField">
+                                Vehicle Variant
+                            </th>
+                            <th class="quotationValue">
+                                : {!product.Variant__c}
+                            </th>
+                        </tr>
+                        <tr>
+                            <th class="quotationField">
+                                Customer Address
+                            </th>
+                            <th class="quotationValue">
+                                : {!Quote.Account.BillingStreet} {!Quote.Account.BillingCity}, {!Quote.Account.BillingState} {!Quote.Account.BillingPostalCode}
+                                {!Quote.Account.BillingCountry}
+                            </th>
+
+                            <!-- Enter Vehicle Model info -->
+                            <th class="quotationField">
+                                Vehicle Color
+                            </th>
+                            <th class="quotationValue">
+                                : {!product.Color__c}
+                            </th>
+                        </tr>
+
+                        <tr>
+                            <th class="quotationField">
+                                Vehicle Model Code
+                            </th>
+                            <th class="quotationValue">
+                                : {!product.ProductCode}
+                            </th>
+
+                        </tr>
+                    </apex:outputPanel>
+                    </apex:repeat>
+                </table>
+                <br/>
+
+                <div class="header">
+                    <h1 class="headerInner">
+                        Pricing Details
+                    </h1>
+                </div>
+                <table>
+                    <tr style="background:red">
+                        <th class="pricing" style="color:white;text-align:center;">
+                            Particulars
+                        </th>
+                        <th class="amount" style="color:white;text-align:center;">
+                            Amount(Rs.)
+                        </th>
+
+                    </tr>
+                    <tr>
+                        <th class="price pricing">
+                            Exshowroom price
+                        </th>
+                        <th class="priceValue amount">
+                            {!exshowroomPrice}
+                        </th>
+                    </tr>
+                    <tr>
+                        <th class="price pricing">
+                            Incidental Charges
+                        </th>
+                        <th class="priceValue amount">
+                            {!Quote.Incidental_Charges__c}
+                        </th>
+                    </tr>
+                    
+                    <tr>
+                        <th class="price pricing">
+                            Tax Collection at Source @ 1%
+                        </th>
+                        <th class="priceValue amount">
+                            {!Quote.Tax}
+                        </th>
+                    </tr>
+                    <tr>
+                        <th class="price pricing">
+                            GST on TCS
+                        </th>
+                        <th class="priceValue amount">
+                            0
+                        </th>
+                    </tr>
+                    <tr>
+                        <th class="price pricing">
+                            Registration
+                        </th>
+                        <th class="priceValue amount">
+                            {!Quote.Registration__c}
+                        </th>
+                    </tr>
+                    <tr>
+                        <th class="price pricing">
+                            Road Safty Tax
+                        </th>
+                        <th class="priceValue amount">
+                            {!Quote.Road_Safety_Tax__c}
+                        </th>
+                    </tr>
+                    <tr>
+                        <th class="price pricing">
+                            Insurance
+                        </th>
+                        <th class="priceValue amount">
+                            {!Quote.Insurance__c}
+                        </th>
+                    </tr>
+                    <tr>
+                        <th class="price pricing">
+                            zero Deprication Insurance Cost
+                        </th>
+                        <th class="priceValue amount">
+                            {!Quote.Zero_Depreciation_Insurance_Cost__c}
+                        </th>
+                    </tr>
+                    <tr>
+                        <th class="price pricing">
+                            Consumer Scheme
+                        </th>
+                        <th class="priceValue amount">
+                            {!Quote.Consumer_Scheme__c}
+                        </th>
+                    </tr>
+                    <tr>
+                        <th class="price pricing">
+                            Corporate Bonus
+                        </th>
+                        <th class="priceValue amount">
+                            {!Quote.Corporate_Bonus__c}
+                        </th>
+                    </tr>
+                    <tr>
+                        <th class="price pricing">
+                            Exchange Bonus
+                        </th>
+                        <th class="priceValue amount">
+                            {!Quote.Exchange_Bonus__c}
+                        </th>
+                    </tr>
+                    <tr>
+                        <th class="price pricing">
+                            Loyalty Bonus
+                        </th>
+                        <th class="priceValue amount">
+                            {!Quote.Loyalty_Bonus__c}
+                        </th>
+                    </tr>
+                    <tr>
+                        <th class="price pricing">
+                            Dealer Discount/Special Discount
+                        </th>
+                        <th class="priceValue amount">
+                            {!Quote.Dealer_Discount_Special_Discount__c}
+                        </th>
+                    </tr>
+                    <tr>
+                        <th class="price pricing">
+                         Discounts Total
+                        </th>
+                        <th class="priceValue amount">
+                            {!Quote.Discounts_Total__c}
+                        </th>
+                    </tr>
+                    <apex:repeat value="{!qLiList}" var="qLst" id="theRepeatQLI">
+                        <apex:outputPanel rendered="{!IF(qLst.Product2.Type__c ='Vehicle' ,false,true)}">
+                            <tr>
+                                <th class="price pricing">
+                                        {!qLst.product2.Name}
+                                </th>
+                                <th class="priceValue amount">
+                                        {!qLst.UnitPrice}
+                                </th>
+    
+                            </tr>
+                        </apex:outputPanel>
+                    </apex:repeat>
+                   
+                   
+                    <tr>
+                        <th class="price pricing">
+                            On Road Price
+                        </th>
+                        <th class="priceValue amount">
+                            {!Quote.Total_price__c}
+                        </th>
+                    </tr>
+                    <tr>
+                        <th class="price pricing">
+                            Total Quotation Amount
+                        </th>
+                        <th class="priceValue amount">
+                            {!Quote.Grand_Total__c}
+                        </th>
+                    </tr>
+                </table>
+                <br/>
+                <!-- DISCLAIMER -->
+                <hr/>
+                <div>
+
+                    <div class="Disclaimer">
+
+                        Disclaimer
+
+                    </div>
+                    <hr/>
+                    <div id="disclaimer" class="disclaimerText">
+                        {!Disclaimer}
+                    </div>
+                    <br/>
+                </div>
+                <hr/>
+                <!-- Terms and Conditions -->
+                <div id="TnCHead">
+                    <div class="Disclaimer">
+
+                        Terms and Conditions
+
+                    </div>
+                    <hr/>
+
+                    <div id="TnCContent">
+                        <apex:repeat value="{!terms}" var="term">
+
+                            {!term}
+                            <br/>
+                        </apex:repeat>
+                    </div>
+                    <br/>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="footer">
+        <div>
+                
+
+        </div>
+    </div>
+</apex:page>

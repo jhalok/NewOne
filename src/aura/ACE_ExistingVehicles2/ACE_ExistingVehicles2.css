@@ -1,0 +1,21 @@
+.THIS .myRow{
+    padding-bottam:10px;
+}
+.THIS h4{
+  font-size:  15px;
+}
+.THIS #addrow{
+  float: right !important;
+    margin-top: 15px !important;
+}
+.THIS td{
+     padding: 5px!important;
+    padding-top: 0!important;
+    padding-bottom: 10px!important;
+}
+.THIS th>div{
+    text-transform: capitalize;
+}
+.THIS .hideLab label {
+  display: none;
+}

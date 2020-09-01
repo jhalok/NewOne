@@ -1,0 +1,39 @@
+.THIS .parent{
+    margin-left: 8%;
+    text-align: center;
+    
+}
+.THIS .cancel{
+    margin-top: -2rem;
+    margin-left: 11rem;;
+}
+.THIS .uiModal .modal-body {
+    overflow-y: hidden !important;
+}
+.THIS .cuf-content{
+    padding-left: 0% !important;
+}
+.THIS.mainDiv{
+    padding-right: 2%;
+    margin-left: -5%;
+}
+.THIS .slds-modal__container {
+    min-width: 50rem !important;
+    max-width: 70rem !important;
+    width: 80% !important;
+}
+.THIS .slds-modal__footer {
+    border: none !important;
+    background-color: rgb(243,242,242) !important;
+    margin-top: 2rem !important;
+}
+.THIS .slds-theme_shade .slds-theme--shade {
+    background-color: var(--lwc-colorBackground,rgb(243, 242, 242)) !important;
+}
+.THIS .slds-theme_shade .slds-theme--shade {
+    background-color: rgb(243, 242, 242) !important;
+}
+.THIS .slds-section__title{
+    border-color: black !important;
+    font-weight: 600 !important;
+}

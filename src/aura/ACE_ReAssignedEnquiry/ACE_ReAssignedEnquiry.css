@@ -1,0 +1,43 @@
+.THIS .slds-icon-standard-opportunity {
+	display:none;
+}
+.THIS .slds-text-heading_label,.THIS .slds-text-heading--label {
+    font-size:larger !important;
+}
+.THIS .slds-table_bordered tbody td,.THIS .slds-table_bordered tbody th,.THIS .slds-table--bordered tbody td,.THIS .slds-table--bordered tbody th {
+    font-size:larger !important;
+}
+.THIS .Heading{
+    color: #000000;
+    font-weight: 600;
+}
+.THIS .ButtonProprty{
+    background-color: #e5e5e5 !important;
+    color:rgb(19, 95, 144) !important;
+    margin-left: 120px !important;
+    border: 1px solid white !important;
+}
+.THIS .a{
+    color: black;
+    text-decoration: none;
+    transition: color .1s linear;
+}
+@media (min-width: 48em){
+    .THIS .slds-modal__container {
+        margin-top: 100px !important;
+        margin-right: auto !important;
+        margin-bottom: 0px !important;
+        margin-left: auto !important;
+        height: 600px;
+    }
+}
+.THIS .slds-modal__container {
+	margin-top: 100px !important;
+	margin-right: auto !important;
+	margin-bottom: 0px !important;
+	margin-left: auto !important;
+	height: 600px !important;
+}
+.THIS .slds-clearfix .cACE_ReAssignedEnquiry center {
+    display :none !important;
+}

@@ -1,0 +1,15 @@
+<aura:component >
+    <aura:attribute name="selected" type="boolean" default="false"/>
+    <aura:attribute name="row" type="String" default=""/>
+    <aura:attribute name="col" type="String" default=""/>
+    <aura:registerEvent name="slotEvt" type="c:ScheduleTD_SlotEvt"/>
+
+    <div class="{!v.selected ? 'slotCell selected' : 'slotCell' }">
+        <!--<lightning:button label="+" title="+" onclick="{! c.openModel }"
+                                                          id="{!item1+''+item}" class="addTestDrive" / slds-button_desctructive-->
+        <a onclick="{!c.openModel}" id="{!v.row+'_'+v.col}" style="margin-left:40%;" class="addTestDrive">
+            <lightning:icon iconName="utility:add" variant="error" class="slds-icon slds-icon_small" size="xx-small" alternativeText="add"/>
+            <span class="slds-assistive-text">Add Icon</span>
+        </a>
+    </div>
+</aura:component>

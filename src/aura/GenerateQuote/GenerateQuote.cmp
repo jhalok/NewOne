@@ -1,0 +1,266 @@
+<!--
+  Created By: Krishnan Mishra   <krishnan.mishra@in.pwc.com>
+
+ Purpose:  generating Quote,QuoteLine item and Quote PDF for the corresponding quote on Enquiry object
+
+ Created:  01/11/2019
+
+ Changes: 06/11/2019: store pdf in files section.
+-->
+
+<aura:component
+  implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader"
+  access="global"
+  controller="GenerateQuoteController"
+>
+<aura:html tag="style">
+        .slds-modal__container{
+        max-width: 70rem !important;
+        
+		}
+		.slds-theme_shade {
+			background-color: rgb(243, 242, 242) !important;
+		}
+    </aura:html>
+  <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+ 
+
+  <!-- This attribute is used to store the field names of Quote present on the Quote Layout. -->
+  <aura:attribute
+	name="quoteCharges"
+	type="Quote"
+	default="{'sobjectType': 'Quote'}"
+  />
+  <aura:attribute name="primaryProdName" type="String" />
+  <aura:attribute name="pimaryProdPrice" type="Decimal" />
+  <aura:attribute name="conName" type="String" />
+  <aura:attribute name="saveBefore" type="Quote" />
+  <aura:attribute name="prodType" type="List" />
+  <aura:attribute name="recordId" type="String" />
+  <aura:attribute name="addOnFieldsMap" type="Map" />
+  <aura:attribute name="totAcc" type="Decimal" />
+  <aura:attribute name="baseURL" type="String" />
+  <aura:attribute name="accessoriesSelected" type="List" />
+  <aura:attribute name="accessoriesOptions" type="List" />
+  <aura:attribute name="adOnValue" type="Object[]" />
+  <aura:attribute name="showButton" type="Boolean" default="false" />
+  <aura:attribute name="hideLayer" type="Boolean" default="true" />
+  <aura:attribute name="quoteId" type="String" />
+  <aura:attribute name="showSpinner" type="boolean" default="false" />
+  <aura:attribute name="showPdf" type="boolean" default="false" />
+  <!-- For Edit -->
+  <aura:attribute name="isEdit" type="boolean" default="false" />
+  <aura:attribute name="defaultMap" type="Map" default="{id:'',default:''}"/>
+  <aura:attribute name="oppDetails" type="Object" />
+  <!--aura:attribute name="beforeSaveQuote" type="Quote" /-->
+  <aura:attribute name="beforeSaveQuote" type="List" /><!--Added on 18-12-2019-->
+  <!--aura:attribute name="newProdChangeMap" type="Map" /-->
+
+  <div class="mainDiv">
+	<aura:if isTrue="{! v.showSpinner }">
+	  <lightning:spinner alternativeText="Loading" />>
+	</aura:if>
+
+	<aura:if isTrue="{!v.hideLayer}">
+		
+	  <div class="parent">
+		<div class="slds-section head">
+			<div class="slds-section head">
+			  <h2
+				class="slds-section__title slds-theme_shade primaryPaletteBorder "
+			  >
+				<span class="slds-p-horizontal--small slds-truncate">
+				  Basic Information
+				</span>
+			  </h2>
+			</div>
+		  </div>
+		  <div class="slds-grid slds-wrap slds-gutters">
+			
+			<div class="slds-col slds-size_1-of-2">
+				<lightning:input name="primaryProdName" disabled="true" value="{!v.primaryProdName}" label="Product Name" />
+			</div>
+			<div class="slds-col slds-size_1-of-2">
+				<lightning:input type="number" name="primaryProdPrice" label="Exshowroom price" value="{!v.pimaryProdPrice}" formatter="currency" step="0.01" disabled="true"/>
+			</div>
+			<div class="slds-col slds-size_1-of-2">
+				<lightning:input name="cusName" disabled="true" value="{!v.conName}" label="Customer name" />
+			</div>
+
+		</div>
+		<br />
+		<div class="slds-section head">
+		  <div class="slds-section head">
+			<h3
+			  class="slds-section__title slds-theme_shade primaryPaletteBorder "
+			>
+			  <span class="slds-p-horizontal--small slds-truncate">
+				  <h2>
+					Price
+				  </h2>
+			  </span>
+			</h3>
+		  </div>
+		</div>
+		<div class="slds-grid slds-wrap slds-gutters">
+		  <div class="slds-col slds-size_1-of-2">
+			<lightning:input
+			  label="Incidental Charges"
+			  type="number"
+			  value="{!v.quoteCharges.Incidental_Charges__c}"
+			  step="0.01"
+			  formatter="currency"
+			  name="incidental"
+			  
+			  required="true"
+			/>
+		  </div>
+		  <div class="slds-col slds-size_1-of-2">
+			<lightning:input
+			  label="Registration Charges"
+			  type="number"
+			  value="{!v.quoteCharges.Registration__c}"
+			  name="registration"
+			  step="0.01"
+			  formatter="currency"
+			  required="true"
+			/>
+		  </div>
+		  <div class="slds-col slds-size_1-of-2">
+			<lightning:input
+			  label="Dealer Discount"
+			  type="number"
+			  value="{!v.quoteCharges.Dealer_Discount_Special_Discount__c}"
+			  name="incidental"
+			  step="0.01"
+			  formatter="currency"
+			  required="true"
+			/>
+		  </div> 
+		  <div class="slds-col slds-size_1-of-2">
+			<lightning:input
+			  label="Road Safety Tax Charges"
+			  type="number"
+			  value="{!v.quoteCharges.Road_Safety_Tax__c}"
+			  name="incidental"
+			  step="0.01"
+			  formatter="currency"
+			  required="true"
+			/>
+		  </div>
+		  <div class="slds-col slds-size_1-of-2">
+			<lightning:input
+			  label="Insurance Charges"
+			  type="number"
+			  value="{!v.quoteCharges.Insurance__c}"
+			  name="incidental"
+			  step="0.01"
+			  formatter="currency"
+			  required="true"
+			/>
+		  </div>
+		  <div class="slds-col slds-size_1-of-2">
+			<lightning:input
+			  label="Zero Depreciation Insurance Cost Charges"
+			  type="number"
+			  value="{!v.quoteCharges.Zero_Depreciation_Insurance_Cost__c}"
+			  name="incidental"
+			  step="0.01"
+			  formatter="currency"
+			  required="true"
+			/>
+		  </div>
+		</div>
+		<div id="addOnProducts">
+		  <aura:iteration items="{!v.prodType}" var="types" indexVar="keys">
+			  <div class="slds-section head">
+				<h3
+				  class="slds-section__title slds-theme_shade primaryPaletteBorder "
+				>
+					<span class="slds-p-horizontal--small slds-truncate">
+						<h2>
+							{!types.label}
+						</h2>
+					</span>
+				</h3>
+			  </div>
+			  <div class="slds-grid slds-wrap slds-gutters">
+				<div class="slds-col slds-size_1-of-2">
+				  <lightning:combobox
+					name="{!types.label}"
+					variant="label-hidden"
+					options="{!types.value}"
+					onchange="{! c.prodChange }"
+					value="{!types.default}"
+					aura:id="combo"
+				  />
+				</div>
+				<br />
+				<div class="slds-col slds-size_1-of-2">
+				  <aura:iteration items="{!v.adOnValue}" var="adOn" indexVar="ad">
+					  <aura:if isTrue="{!adOn.label == types.label}">
+					  <lightning:formattedNumber
+						value="{!adOn.label == types.label ? adOn.price : 0}"
+						currencyCode="INR"
+						style="currency"
+					  />
+					  </aura:if>
+				  </aura:iteration>
+				</div>
+				 
+			  </div>
+		  </aura:iteration>
+		  <div id="accessories">
+			  <aura:if isTrue="{!v.accessoriesOptions.length > 1}">
+				  <div class="slds-section head">
+					  <div class="slds-section head">
+						<h3
+						  class="slds-section__title slds-theme_shade primaryPaletteBorder "
+						>
+						  <span class="slds-p-horizontal--small slds-truncate">
+							Accessory
+						  </span>
+						</h3>
+					  </div>
+					</div>
+					<div id="accOpts">
+							<div class="slds-grid slds-wrap slds-gutters">
+								<div class="slds-col slds-size_1-of-2">
+									<c:MultiSelect options="{!v.accessoriesOptions}" label="Accessories"  accessoriesSelected= "{!v.accessoriesSelected}" totAcc="{!v.totAcc}"	/>
+								</div>
+								<div class="slds-col slds-size_1-of-2">
+										<aura:if isTrue="{!v.accessoriesSelected}">
+											<lightning:formattedNumber
+												value="{!v.totAcc}"
+												currencyCode="INR"
+												style="currency"
+											/>
+										</aura:if>
+								</div>
+							</div>
+
+					</div>
+			  </aura:if>
+		  </div>
+		</div>
+		<div class="modal-footer slds-modal__footer slds-size_1-of-1">
+			<lightning:button variant="Brand" class="slds-button" label="Save" onclick="{!c.handleSubmit}"/>
+			<lightning:button variant="Neutral" class="slds-button" label="Cancel" onclick="{!c.handleClose}"/>
+		</div>
+	  </div>
+	</aura:if>
+	<aura:if isTrue="{!v.showPdf}">
+	  <iframe
+		src="{! v.baseURL + '/apex/QuotePdfAsRender?id=' + v.quoteId }"
+		width="111%"
+		height="500px;"
+		frameborder="0"
+		target="_blank"
+	  />
+	</aura:if>
+	
+ 
+	</div>
+  
+
+</aura:component>

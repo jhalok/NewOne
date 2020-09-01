@@ -1,0 +1,38 @@
+<aura:component controller="ACE_IncomingSiqChatController"
+                implements="force:lightningQuickAction,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId" >
+
+    <aura:attribute type="String" name="parentRecId" />
+    <aura:attribute type="String" name="chatSiqId" />
+    <aura:attribute type="String" name="phoneNum" />
+    <aura:attribute name="ChatDtl" type="Map" default="{'chatId':'','parentId':'','contactNo':''}"/>
+    <aura:attribute type="String" name="pdfViewUrl" />
+    <!--<aura:attribute name="chatTranscript" type="string" default="Received Response:"/>
+    <aura:attribute type="list" name="recordUIList" />-->
+    <aura:handler name="init" value="{!this}" action="{!c.FetchChat}"/>  
+    
+    <lightning:card title="SalesIQ Chat Transcript" iconName="custom:custom21">
+        <!--Pid:<ui:outputText value="{!v.parentRecId}"/><br/>
+        Cid:<ui:outputText value="{!v.chatSiqId}"/><br/>-->
+        <iframe src="{!v.pdfViewUrl}" height="350px" style="border:0px; width:100%; min-width:600px;" />
+        <div class="slds-grid slds-wrap">
+            <!--<div class="slds-size_1-of-2" >
+                <lightning:input class="slds-m-around_x-small" aura:id="CustomerField" 
+                                 name="parentId" label="Attach To Parent:" 
+                                 value="{!v.ChatDtl.parentId}" />
+            </div>-->
+        </div>
+        <div class="slds-p-around_medium" style="display:none;">
+            <!--<iframe src="/apex/SD_APIvfp" height="100px" style="border:0px; width:100%; min-width:100px;" /-->
+            <!--<lightning:button  aura:id="customerField"  label="Fetch Chat Transcript(s)"
+                              onclick="{!c.FetchChat}" variant="brand" />
+            <br/><br/>
+            <ui:outputText value="{!v.chatTranscript}"/>
+            <ui:outputText value="{!v.recordId}"/>-->
+            
+           
+
+            <lightning:button  aura:id="customerField"  label="Refresh.."
+                              onclick="{!c.ResetToken}" variant="brand" />
+        </div>
+    </lightning:card>
+</aura:component>

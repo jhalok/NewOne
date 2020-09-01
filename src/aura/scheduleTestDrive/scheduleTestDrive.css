@@ -1,0 +1,47 @@
+.THIS {
+}
+.THIS #customers {
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.THIS #customers td,  .THIS #customers th {
+    border: 1px solid #ddd;
+    
+}
+
+.THIS #customers tr:nth-child(even){background-color: #f2f2f2;}
+
+.THIS #customers tr:hover {background-color: #ddd;}
+
+.THIS #customers th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    background-color: red;
+    color: white;
+}
+.THIS .addTestDrive{
+    width : 100%;
+}
+.THIS .time_data{
+    text-align: center;
+    
+}
+.THIS .dealerData{
+    text-align: center;
+}
+.THIS .scrollit{
+     overflow:scroll;
+    height:100px;
+}
+.THIS .dateSelecter{
+    width: 200px;
+    margin-bottom: 20px;
+    float:left;
+}
+.THIS .goButton{
+    margin-top: 22px;
+    margin-left: 10px;
+}

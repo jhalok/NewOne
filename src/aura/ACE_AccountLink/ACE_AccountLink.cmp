@@ -1,0 +1,6 @@
+<aura:component >
+    <aura:attribute name="accountRecord" type="Account" />
+	<aura:attribute name="baseUrl" type="String" />
+     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <a href="{!v.baseUrl}" >{!v.accountRecord.Name}</a>
+</aura:component>

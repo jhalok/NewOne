@@ -1,0 +1,212 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" controller="ACE_ContactInsertController">
+    <aura:attribute name="options" type="List" default="[
+                                                        {'label': 'YES', 'value': 'YES'},
+                                                        {'label': 'No', 'value': 'No'}
+                                                        ]"/>
+    <aura:handler name="init" value="this" action="{!c.doInit}"/> 
+    <aura:attribute name="objDetail" type="Contact" default="{'sobjectType' : 'Contact'}"/>
+    <aura:attribute name="Vehicle_Number__c" type="string" default=""/>
+    <aura:attribute name="SalutationPick" type="list" default="[]" description="Stores Yes/No"/>
+    <aura:attribute name="Salutation" type="string" default="Salutation" description="values for picklist"/>
+    <aura:attribute name="BusinessUnitPick" type="list" default="[]" description="Stores BU values"/>
+    <aura:attribute name="BusinessUnit" type="string" default="Business_Unit__c" description="values for picklist"/>
+    <aura:attribute name="value" type="String" default=""/>
+    <aura:attribute name="toggleChange" type="boolean" default="false" />
+    <aura:attribute name="LeadList" type="Lead[]" />
+    <aura:Attribute name="outputValue" type="String" default="" />
+    <ui:outputText aura:id="outName" value="{!v.outputValue}" class="text"/>
+    <aura:attribute name="single" type="sobject" default="{
+                                                          'sobjectType': 'Lead',
+                                                          'LastName': '',
+                                                          'MobilePhone': '',
+                                                          'Company': 'testing',
+                                                          'Status': 'Open - Not Contacted',
+                                                          'Contact_Time__c' : '',
+                                                          'Referred_By__c' : '',
+                                                          'disable':false
+                                                          }"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="contactRecord" type="Contact" />
+    
+    
+    
+    <div class="slds-page-header">
+        <p class="slds-text-heading--label" align="center"><b>Employee Referrals </b></p>
+    </div>
+    <div style="text-align: justify;" class="slds-p-around_medium">
+        <p>Dear Colleague,</p>
+        <p>Welcome to the Mahindra Road to Rewards employee referral portal. Refer your friends and relatives to buy a Mahindra vehicle and earn exciting rewards of your choice. Begin by just filling the form below.</p>
+    </div>
+    
+    <div class="slds-align_absolute-center">
+        
+    </div>
+    
+    <div class="slds-grid slds-gutters  slds-align_absolute-center">
+        <div class="slds-col slds-size_1-of-4" >
+            <lightning:select name="SalPick"
+                              value="{!v.objDetail.Salutation}"
+                              label="Salutation" >
+                 <option value="">choose one...</option>
+                <aura:iteration items="{!v.SalutationPick}" var="val" >
+                    
+                    <option value="{!val.value}" >{!val.label}</option>
+                </aura:iteration>
+            </lightning:select>
+        </div>
+        <div class="slds-col slds-size_1-of-4">
+            <lightning:input name="EmployeeId" aura:id="conEmpNumber" placeholder="Enter Employee ID" label="Employee Id" value="{!v.objDetail.Employee_Id__c}" />
+        </div>
+    </div>   
+    
+    <div class="slds-grid slds-gutters  slds-align_absolute-center">
+        <div class ="slds-col slds-size_1-of-4">
+            <lightning:input label="Name" required ="true" name="EnterName" placeholder="Enter The Name" aura:id="conLastName" 
+                             value="{!v.objDetail.LastName}"/>
+        </div>
+        
+        <div class="slds-col slds-size_1-of-4">
+            <lightning:input label="Mobile" required ="true" name="MobileNumber" placeholder="Enter The Mobile Number" aura:id="conMobileNumber" 
+                             value="{!v.objDetail.MobilePhone}"/>
+        </div>
+    </div>
+    
+    <div class="slds-grid slds-gutters  slds-p-around_medium">
+        <div class = "slds-col slds-size_1-of-4">
+            
+        </div>
+        <div class = "slds-col slds-size_1-of-4">
+            <lightning:input label="Email" required ="true" name="EnterEmail" placeholder="Enter Email - ID" aura:id="conEmail" 
+                             value="{!v.objDetail.Email}"/>
+        </div>
+        
+        
+    </div>
+    <div class="slds-grid slds-gutters  slds-align_absolute-center">
+        <div class = "slds-col slds-size_1-of-4">
+            <lightning:textarea  name="input1" label="Address 1" value ="{!v.objDetail.MailingStreet}"/>       
+        </div>
+        <div class="slds-col slds-size_1-of-4">
+            <lightning:input type="text" name="mailingCity" label="Location" value="{!v.objDetail.MailingCity}"/>
+        </div>
+    </div>
+    <div class="slds-grid slds-gutters slds-p-around_medium">
+        <div class = "slds-col slds-size_1-of-4">
+            
+        </div>
+        <div class = "slds-col slds-size_1-of-4">
+            <lightning:input type="text" name="mailingState" label="Address 2" value="{!v.objDetail.MailingState}" />
+        </div>
+    </div>
+    <div class="slds-grid slds-gutters  slds-align_absolute-center">
+        <div class = "slds-col slds-size_1-of-4">
+            <lightning:radioGroup name="radioGroupRequired" aura:id="radioGroupRequired"
+                                  label="Do you own a Mahindra vehicle?"
+                                  options="{! v.options }"
+                                  value="{! v.value }" 
+                                  type="radio"
+                                  required="true" onchange="{!c.toggle}"/>
+        </div>
+        <div class="slds-col slds-size_1-of-4">
+                 <aura:if isTrue="{!v.toggleChange == true}">
+            <lightning:input type="text" label="Vehicle Number" placeholder ="Enter Vehicle Number"  aura:id="VehNumber" value = "{!v.Vehicle_Number__c}" name="Vehicle Number"/>
+            </aura:if>  </div> 	
+
+    </div>          
+    
+    <div class="slds-grid slds-gutters  slds-align_absolute-center">
+        <div class="slds-col slds-size_1-of-4" >
+            <lightning:select name="BusinessDetail"
+                              value="{!v.objDetail.Business_Unit__c}"
+                              label="BusinessUnit">
+                <option value="">choose one...</option>
+                <aura:iteration items="{!v.BusinessUnitPick}" var="val">
+                   
+                    <option value="{!val.value}">{!val.label}</option>
+                </aura:iteration>
+            </lightning:select>
+        </div>
+        <div class = "slds-col slds-size_1-of-4">
+            
+        </div>        
+    </div>
+    <br/>    
+    <p><b>Refer a friend/relative:</b></p>
+    <br/>
+    <div class="slds-p-around_medium">
+        <table class="slds-table slds-table_bordered slds-table_cell-buffer"> 
+            <thead>
+                <tr class="slds-text-title_caps">
+                    <th scope="col">
+                        <div class="" style="text-transform: capitalize;text-align:center;">Sr.No.</div>
+                    </th>
+                    <th scope="col">
+                        <div class="" style="text-transform: capitalize;text-align:center;" title="Customer Name">Prospect Name</div>
+                    </th>
+                    <th scope="col">
+                        <div class="" style="text-transform: capitalize;text-align:center;" title="Interested In">Interested In</div>
+                    </th>
+                    <th scope="col">
+                        <div class="" style="text-transform: capitalize;text-align:center;"  title="Mobile Number">Mobile No.</div>
+                    </th>
+                    <th scope="col">
+                        <div class="" style="text-transform: capitalize;text-align:center;" title="Email Address">Email Address</div>
+                    </th>
+                    <th scope="col">
+                        <div class="" style="text-transform: capitalize;text-align:center;" title=" City">City</div>
+                    </th>
+                    <th scope="col">
+                        <div class="" style="text-transform: capitalize;text-align:center;" title=" Contact Time">Contact Date Time</div>
+                    </th>
+                    
+                    <th scope="col">
+                        <div class="slds-truncate" style="text-transform: capitalize;text-align:center;" title=" Action	">Delete	</div>
+                    </th>
+                </tr>
+            </thead>   
+            <tbody>
+                <aura:iteration items="{!v.LeadList}" var="item" indexVar="index">
+                    <tr class="slds-text-title_caps" >         
+                        <td style="    padding-top: 15px;"> 
+                            {!index + 1}
+                        </td>
+                        <td data-label="Name" scope="row" >
+                            <lightning:input type="text" aura:id="getValueForCheak" value="{!item.LastName}"  disabled="{!item.disable}"/>
+                        </td>
+                        <td data-label="Interested_In__c" scope="row" style="padding-top: 19px !important; ">
+                            
+                            <c:ACE_CustomLookup objectName="Product2" fieldName="Name"  iconName="standard:product" placeholder="Enter Vehicle" value="{!item.Interested_In__c}" />
+                        </td>
+                        <td data-label="MobilePhone" scope="row" >
+                            <lightning:input type="phone" value="{!item.MobilePhone}"   disabled="{!item.disable}"/>
+                        </td>
+                        <td data-label="Email" scope="row" >
+                            <lightning:input type="Email" value="{!item.Email}"   disabled="{!item.disable}"/>
+                        </td>
+                        <td data-label="Address" scope="row" >
+                            <lightning:input type="text" value="{!item.Address}"   disabled="{!item.disable}"/>
+                        </td>
+                        <td data-label="Date" scope="row" >
+                            <lightning:input type="datetime" value="{!item.Contact_Time__c}"   disabled="{!item.disable}"/>
+                        </td>
+                        
+                        <td style="    padding-top: 15px;text-align:center;">
+                            <a onclick="{!c.delSingleRow}" id="{!index}" >
+                                <lightning:icon variant="error" iconName="utility:delete" class="slds-icon slds-icon_small" size="small" alternativeText="icon"/>
+                                <span class="slds-assistive-text">Delete Icon</span>
+                            </a>
+                        </td> 
+                        
+                    </tr>
+                </aura:iteration>
+            </tbody>
+        </table>
+        <button class="slds-button slds-button_brand addrow" style="float: right !important;margin-top: 15px !important;" onclick="{!c.addRowData}">Add More</button>
+        <br/>
+        <br/>
+        <br/>
+        
+        <button class="slds-button slds-button_destructive" onclick="{!c.save}" >SUBMIT</button>
+         <button class="slds-button slds-button_destructive" onclick="{!c.clearName}">RESET</button>
+    </div>
+</aura:component>

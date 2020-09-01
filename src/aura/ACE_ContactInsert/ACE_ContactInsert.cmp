@@ -1,0 +1,123 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" controller="ACE_ContactInsertController" >
+    <aura:attribute name="options" type="List" default="[
+    {'label': 'YES', 'value': 'YES'},
+    {'label': 'No', 'value': 'No'}
+    ]"/>
+     <aura:handler name="init" value="this" action="{!c.doInit}"/> 
+    <aura:attribute name="objDetail" type="Contact" default="{'sobjectType' : 'Contact'}"/>
+    <aura:attribute name="SalutationPick" type="list" default="[]" description="Stores Yes/No"/>
+    <aura:attribute name="Salutation" type="string" default="Salutation" description="values for picklist"/>
+    <aura:attribute name="value" type="String" default=""/>
+    <aura:attribute name="toggleChange" type="boolean" default="false" />
+    <div class="slds-page-header">
+    <p class="slds-text-heading--label" align="center"><b>Employee Referrals </b></p>
+     </div>
+    <div style="text-align: justify;">
+        <p>Dear Colleague,</p>
+        <p>Welcome to the Mahindra Road to Rewards employee referral portal. Refer your friends and relatives to buy a Mahindra vehicle and earn exciting rewards of your choice. Begin by just filling the form below.</p>
+    </div>
+        <div class="slds-grid slds-gutters slds-size_1-of-1 slds-p-around_medium">
+            <div class="slds-col" >
+            <lightning:select name="Salutation" value="{!v.objDetail.Salutation}" label="Salutation" >
+               <!-- <option value="">choose one...</option>
+                <option value="1">Mr.</option>
+                <option value="2">Mrs.</option>
+                <option value="3">Miss.</option>-->
+                <aura:iteration items="{!v.SalutationPick}" var="val">
+                    <option value="{!val.value}">{!val.label}</option>
+                </aura:iteration>
+            </lightning:select>
+        </div>
+        <div class="slds-col">
+            <lightning:input name="EmployeeId" aura:id="conEmpNumber" placeholder="Enter Employee ID" label="Employee Id" value="{!v.objDetail.Employee_Id__c}" />
+        </div>
+          </div>
+    <div class="slds-grid slds-gutters slds-size_1-of-1 slds-p-around_medium">
+        <div class = "slds-col">
+            <lightning:input name="Name" placeholder="Enter the Name" label="Name" aura:id="conLastName" 
+                         value="{!v.objDetail.LastName}"/>
+        </div>
+        <div class="slds-col">
+            <lightning:input type="tel" name="MobileNumber" placeholder="Enter Mobile number" label="Mobile Number" value="{!v.objDetail.MobilePhone}" />
+        </div>
+        </div>
+        <div class="slds-grid slds-gutters slds-size_1-of-1 slds-p-around_medium">
+            <div class = "slds-col">
+            <lightning:input type="email" name="Email" placeholder="Enter EmailID" label="Email" aura:id="conEmail" 
+                         value="{!v.objDetail.Email}"/>
+             </div>
+        </div> 
+        <div class="slds-grid slds-gutters slds-size_1-of-1 slds-p-around_medium">
+            <div class = "slds-col">
+  		     <lightning:textarea  name="input1" label="Address 1" value ="{!v.objDetail.MailingStreet}"/>       
+        </div>
+        <div class="slds-col">
+            <lightning:input type="text" name="mailingCity" label="Location" value="{!v.objDetail.MailingCity}"/>
+        </div>
+          </div>
+        <div class="slds-grid slds-gutters slds-size_1-of-1 slds-p-around_medium">
+            <div class = "slds-col">
+            <lightning:input type="text" name="mailingState" label="Address 2" value="{!v.objDetail.MailingState}" />
+        </div>
+      <!---  <div class="slds-col">
+            <lightning:input type="number" name="mailingCity" label="Mailing Zip/Postal Code" />
+        </div> -->
+            </div>
+      <!---  <div class="slds-grid slds-gutters slds-size_1-of-1 slds-p-around_medium">
+            <div class = "slds-col">
+            <lightning:input type="text" name="mailingCountry" label="Mailing Country" />
+        </div>
+            </div>-->
+        <div class="slds-grid slds-gutters slds-size_1-of-1 slds-p-around_medium">
+            <div class = "slds-col">
+     
+    <lightning:radioGroup name="radioGroupRequired" aura:id="radioGroupRequired"
+                          label="Do you own a Mahindra vehicle?"
+                          options="{! v.options }"
+                          value="{! v.value }" 
+                          type="radio"
+                          required="true" onchange="{!c.toggle}"/>
+       <aura:if isTrue="{!v.toggleChange == true}">
+        <div class="demo-only demo-only--sizing slds-grid slds-wrap slds-p-vertical_medium">
+            <div class="slds-size_3-of-12 slds-p-left_xx-large slds-p-horizontal_x-large" >
+                <lightning:input type="text" label="Vehicle Number" name="Vehicle Number"/>
+            </div>
+        </div> 	
+    </aura:if>               
+        </div>
+    </div>
+ 
+    <div class="slds-grid slds-gutters slds-size_1-of-1 slds-p-around_medium">
+            <div class = "slds-col">
+    <lightning:select name="select1" label="Business Unit" required="False">
+        <option value="">....choose...</option>
+        <option value="1">AD Haridwar Plant</option>
+        <option value="2">AD Igatpuri Plant</option>
+        <option value="3">AD Kandivali Plant</option>
+        <option value="3">AD Mahindra Vehicle Manufacturers Ltd.</option>
+        <option value="3">AD Nashik Plant</option>
+        <option value="3">AD Zaheerabad Plant</option>
+        <option value="3">Agribusiness Samriddhi</option>
+        <option value="3">Bristlecone</option>
+        <option value="3">Farm Division</option>
+        <option value="3">FES Nagpur Plant</option>
+        <option value="3">FES Rudrabad Plant</option>
+        <option value="3">FES Zaheerabad Plant</option>
+        <option value="3">International Operations</option>
+        <option value="3">Mahindra Financial Services</option>
+        <option value="3">Mahindra Acres Consulting</option>
+        <option value="3">Mahindra Aerospace</option>
+        <option value="3">Mahindra Automotive</option>
+        <option value="3">Mahindra Construction Equipment</option>
+        <option value="3">Mahindra Conveyor Systems</option>
+        <option value="3">Mahindra Defence Systems</option>
+        <option value="3">Mahindra EPC</option>
+        <option value="3">Mahindra First Choice Services</option>
+        <option value="3">Mahindra First Choice Wheels</option>
+        <option value="3">Mahindra Graphic Research Design</option>
+        <option value="3">Mahindra Gujarat Tractor Ltd.</option>
+    </lightning:select>
+    </div>
+    </div>
+    
+</aura:component>

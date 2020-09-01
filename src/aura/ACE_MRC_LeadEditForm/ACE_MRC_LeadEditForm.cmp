@@ -1,0 +1,41 @@
+<aura:component implements="force:appHostable,force:lightningQuickActionWithoutHeader,flexipage:availableForRecordHome,force:hasRecordId" access="global" >
+    <!--Declare Atrribute-->
+    <aura:attribute name="lead" type="Object"/>
+    <aura:attribute name="leadRecord" type="Object"/>
+    <aura:attribute name="recordSaveError" type="String"/>
+     
+    <force:recordData aura:id="leadRec"
+                      layoutType="FULL"
+                      recordId="{!v.recordId}" 
+                      targetError="{!v.recordSaveError}"
+                      targetRecord="{!v.lead}"
+                      targetFields="{!v.leadRecord}"
+                      mode="EDIT"
+                      recordUpdated="{!c.handleRecordUpdated}"/>
+     
+    <div class="slds-box"> 
+        <div class="slds-text-heading_medium">
+            {!v.leadRecord.Name}
+        </div> 
+         
+        <aura:if isTrue="{!not(empty(v.recordSaveError))}">
+            <br />
+            <div class="error slds-box">
+                {!v.recordSaveError}
+            </div> 
+        </aura:if>
+         
+        <div class="slds-form--stacked slds-tile"> 
+            <div class="slds-form-element">
+                <lightning:inputField fieldName="{!v.leadRecord.Name}" />
+            </div>
+            <div class="slds-form-element">
+                <lightning:inputField fieldName="{v.leadRecord.Address}" />
+            </div>
+            <div class="slds-form-element">
+                <lightning:button variant="brand" title="Save" label="Save" onclick="{!c.handleSaveLead}"/>
+                <lightning:button title="Cancel" label="Cancel" onclick="{!c.handleCancel}"/>
+            </div>
+        </div>
+    </div>
+</aura:component>

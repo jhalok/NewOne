@@ -1,0 +1,30 @@
+<aura:component implements="force:hasRecordId" access="global">
+    <aura:attribute name="obName" type="String" />
+    <aura:attribute name="fieldName" type="String" />
+    <aura:attribute name="record" type="Object"/>
+    <aura:attribute name="simpleRecord" type="Object"/>
+    <aura:attribute name="recordError" type="String"/>
+    <aura:attribute name="pageReference" type="Object"/>
+    <lightning:navigation aura:id="navService"/>
+    
+    
+    
+    <force:recordData aura:id="recordLoader"
+                      recordId="{!v.recordId}"
+                      layoutType="COMPACT"
+                      targetRecord="{!v.record}"
+                      targetFields="{!v.simpleRecord}"
+                      targetError="{!v.recordError}"  />
+    <!-- Display a header with details about the record -->
+    <div class="slds-page-header" role="banner">
+        <tr>
+            <td>
+                
+              <a href="{!'/one/one.app?#/sObject/'+v.recordId+'/view'}" > <lightning:formattedText value="{!v.simpleRecord.Name}" /></a>
+               
+                    
+            </td>
+            
+        </tr>
+    </div>
+</aura:component>

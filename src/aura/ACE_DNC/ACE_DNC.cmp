@@ -1,0 +1,24 @@
+<aura:component controller ="ACE_DNC_Controller" implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" access="global" >
+    <aura:attribute name="lead" type="Lead"/>
+    <aura:attribute name="selectedExpirationValue" type="string" default="Never"/>
+    <aura:attribute name="expDurationList" type="Object[]" />
+    <aura:attribute name="recordId" type="String" />
+    <aura:method name="updateDNC" action="{!c.updateDNC}" access="PUBLIC"/>
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <!-- SEARCH INPUT AND SEARCH BUTTON-->
+    <article class="slds-card">
+        <div class="slds-card__body" style="padding:10px;">
+            <div class="slds-form-element">
+                <div class="slds-form-element__control">
+                    <lightning:select aura:id="expDuration" label="Do Not Contact until" value="{!v.selectedExpirationValue}">
+                        <option value="{!v.selectedExpirationValue}">Please select Disposition</option>
+                        <aura:iteration items="{!v.expDurationList}" var="value">
+                            <option value="{!value}" text="{!value}"/>
+                        </aura:iteration>
+                    </lightning:select>
+                </div>
+            </div>
+        </div>
+    </article>
+</aura:component>

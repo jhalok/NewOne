@@ -1,0 +1,39 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader" access="global" >
+    <aura:attribute name="projectId" type="String" />
+    <aura:attribute name="ShowModuleBoxForBulk" type="boolean" default="false"/>
+    <aura:registerEvent name="modalClose" type="c:ACE_CloseParentFromChild"/>
+    <aura:html tag="style">
+        .slds-modal__container {
+            width : 95% !important;
+            max-width: unset !important;
+            
+
+        }
+        .outterModal{
+            padding: 0 !important;
+        }
+        .innerContentStyle{
+            padding: 0;
+            width: 100% !important;
+        }
+        
+    </aura:html>
+    <div class="slds-modal__container innerContentStyle" style="min-height: 400px;" >
+        <!--Modal/Popup Box Body Starts here-->
+        <div class="slds-modal__content outterModal slds-p-around_medium dsjgj" id="modal-content-id-1 " >
+            <c:ACE_dynamicRow  aura:id="cdynamicRowComp"/>
+        </div>
+        <!--Modal/Popup Box Footer Starts here-->
+        <footer class="slds-modal__footer">
+            <lightning:button variant="brand"
+                            label="Cancel"
+                            title="Cancel"
+                            onclick="{! c.closeModel }"/>
+            <lightning:button variant="brand"
+                            label="Save"
+                            title="Save"
+                            onclick="{!c.saveData}"/>
+        </footer>
+    </div>
+    
+</aura:component>

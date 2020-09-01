@@ -1,0 +1,16 @@
+<aura:component implements="force:hasRecordId,force:lightningQuickActionWithoutHeader" controller="ACE_CreateEnquiryAPICallout">
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="recordId" type="String" />
+       <!--<div class="slds-is-relative" >
+        <lightning:spinner aura:id="Spinner" alternativeText="Processing" size="medium" variant="brand"/>
+       </div>-->        
+        <aura:html tag="style">
+        .slds-fade-in-open {
+            display:none !important;
+        }
+        <!--.slds-backdrop {
+            background: rgba(43, 40, 38, 0) !important;  
+        }-->
+    </aura:html>
+</aura:component>

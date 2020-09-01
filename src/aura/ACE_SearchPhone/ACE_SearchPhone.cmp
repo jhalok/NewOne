@@ -1,0 +1,11 @@
+<aura:component controller="ACE_PhoneSearchController">
+
+    <div onkeyup="{! c.handleKeyUp }">
+        <lightning:input
+            aura:id="search"
+            name="Enter Phone Number"
+            label="Phone...."
+            type="search"
+        />
+    </div>
+</aura:component>

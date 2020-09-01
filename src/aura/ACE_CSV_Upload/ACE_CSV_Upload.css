@@ -1,0 +1,32 @@
+.THIS .removeLabel label{
+    display:none;
+}
+.THIS .invalidData{
+    border: 2px solid red;
+    border-radius: 5px;
+}
+.THIS .slds-form-element__label{
+    display:none;
+}
+.THIS .tooltip {
+    cursor: pointer;
+    color: #006080;
+}
+.THIS .innerTable td {
+    border: none;
+}
+.THIS .innerTable{
+    width: 50%;
+    margin: 0px !important;
+}
+.THIS .displayBar {
+    height: 42px;
+    width: fit-cover;
+    text-align: center;
+    color: white;
+    background-color: #e53144;
+    padding: 10px;
+    border-radius: 6PX;
+    margin: 10px 5px 15px 5px;
+    font-size: large;
+}

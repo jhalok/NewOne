@@ -1,0 +1,500 @@
+<apex:page standardController="ACE_Booking__c" extensions="BookingPDFController" applyBodyTag="false" showHeader="false"
+    sidebar="false" applyHtmlTag="false" renderAs="Pdf">
+
+    <head>
+        <style type="text/css" media="print">
+            @page {
+
+                @bottom-left {
+                    content: element(footer);
+                }
+            }
+
+            #quoteHeader {
+                text-align: center;
+                color: red;
+                font-size: 16px;
+                margin-top: 3%;
+            }
+
+            #quote {
+                margin-left: 2%;
+                font-size: 14px;
+            }
+
+            #dealerInfoHeader {
+                border-top: solid black 0.5px;
+                border-bottom: solid black 0.5px;
+                min-height: 25px;
+            }
+
+            #dealerInfoHeaderInner {
+                position: relative;
+                top: 5px;
+            }
+
+            .header {
+                background-color: red;
+                text-align: center;
+                min-height: 25px;
+            }
+
+            .headerInner {
+                position: relative;
+                top: 3px;
+                color: white;
+                font-size: 16px;
+            }
+
+            .quotationField {
+                position: relative;
+                top: 3px;
+                width: 18%;
+                font-weight: normal;
+                font-size: 12px;
+            }
+
+            .quotationValue {
+                position: relative;
+                top: 3px;
+                width: 25%;
+                font-weight: normal;
+                font-size: 12px;
+            }
+
+            .pricing {
+                position: relative;
+                top: 3px;
+                width: 10%;
+                font-weight: normal;
+            }
+
+            .amount {
+                width: 7%;
+                position: relative;
+                top: 3px;
+                font-weight: normal;
+            }
+
+            .price,
+            .priceValue {
+                border: 1px solid black;
+            }
+
+            .disclaimerText {
+                font-size: 16px;
+                text-align: left;
+            }
+
+            .TnCContent {
+                font-size: 11px;
+            }
+
+            .Disclaimer {
+                font-weight: bold;
+                font-size: 16px;
+                text-align: center;
+            }
+
+            .headerInnerDis {
+
+                color: Black;
+                font-size: 14px;
+            }
+
+            hr {
+                margin-top: -1px;
+                margin-bottom: 1px;
+            }
+
+            body {
+                border: solid black 2px;
+            }
+
+            div.footer {
+                display: block;
+                padding: 5px;
+                position: running(footer);
+            }
+
+            .pagenumber:before {
+                content: counter(page);
+            }
+
+            .pagecount:before {
+                content: counter(pages);
+            }
+        </style>
+
+    </head>
+    <div style="border:solid black 1px;">
+        <div id="quoteHeader">
+            <h1>
+                {!ACE_Booking__c.Name}
+            </h1>
+
+        </div>
+        <br/>
+        <div id="quote">
+
+            <div class="header">
+                <h1 class="headerInner">
+                    {!$Label.ACE_Customer_Detail}
+                </h1>
+            </div>
+            <div id="quotationBody">
+                <table>
+                    <tr>
+                        <th class="quotationField">
+                            {!$Label.ACE_Customer_Name}:
+                        </th>
+                        <th class="quotationValue">
+                            {!ACE_Booking__c.Customer_Id__r.Name}
+                        </th>
+                        <th class="quotationField">
+                            {!$Label.ACE_Mobile}
+                        </th>
+                        <th class="quotationValue">
+                            {!ACE_Booking__c.Customer_Id__r.MobilePhone}
+                        </th>
+                    </tr>
+                    <tr>
+                        <th class="quotationField">
+                            {!$Label.ACE_Residential_Address}:
+                        </th>
+                        <th class="quotationValue">
+                            <apex:outputPanel rendered="{!ACE_Booking__c.Customer_Id__r.MailingStreet != null}">{!ACE_Booking__c.Customer_Id__r.MailingStreet},&nbsp;</apex:outputPanel>
+                            <apex:outputPanel rendered="{!ACE_Booking__c.Customer_Id__r.MailingCity != null}">{!ACE_Booking__c.Customer_Id__r.MailingCity},&nbsp;</apex:outputPanel>
+                            <apex:outputPanel rendered="{!ACE_Booking__c.Customer_Id__r.MailingState != null}">{!ACE_Booking__c.Customer_Id__r.MailingState},&nbsp;</apex:outputPanel>
+                            <apex:outputPanel rendered="{!ACE_Booking__c.Customer_Id__r.MailingCountry != null}">{!ACE_Booking__c.Customer_Id__r.MailingCountry},&nbsp;</apex:outputPanel>
+                        </th>
+                        <th class="quotationField">
+                            {!$Label.ACE_Registration_Address}:
+                        </th>
+                        <th class="quotationValue">
+                            <apex:outputPanel rendered="{!ACE_Booking__c.Customer_Id__r.MailingStreet != null}">{!ACE_Booking__c.Customer_Id__r.MailingStreet},&nbsp;</apex:outputPanel>
+                            <apex:outputPanel rendered="{!ACE_Booking__c.Customer_Id__r.MailingCity != null}">{!ACE_Booking__c.Customer_Id__r.MailingCity},&nbsp;</apex:outputPanel>
+                            <apex:outputPanel rendered="{!ACE_Booking__c.Customer_Id__r.MailingState != null}">{!ACE_Booking__c.Customer_Id__r.MailingState},&nbsp;</apex:outputPanel>
+                            <apex:outputPanel rendered="{!ACE_Booking__c.Customer_Id__r.MailingCountry != null}">{!ACE_Booking__c.Customer_Id__r.MailingCountry},&nbsp;</apex:outputPanel>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th class="quotationField">
+                            {!$Label.ACE_PANCard}:
+                        </th>
+                        <th class="quotationValue">
+                            {!ACE_Booking__c.Customer_Id__r.PANCard__c}
+                        </th>
+                        <th class="quotationField">
+                            {!$Label.ACE_M_and_M_Corp_Name}:
+                        </th>
+                        <th class="quotationValue">
+
+                        </th>
+                    </tr>
+                    <tr>
+                        <th class="quotationField">
+                            {!$Label.ACE_User_Name}:
+                        </th>
+                        <th class="quotationValue">
+
+                        </th>
+                        <th class="quotationField">
+                            {!$Label.ACE_Contact_timing}:
+                        </th>
+                        <th class="quotationValue">
+
+                        </th>
+                        <th class="quotationField">
+                            {!$Label.ACE_Model}:
+                        </th>
+                        <th class="quotationValue">
+                            {!listOfOpportunities[0].OpportunityLineItems[0].Product2.Vehicle_Model__c}
+                        </th>
+                    </tr>
+
+                    <tr>
+                        <th class="quotationField">
+                            {!$Label.ACE_Customer_Address}:
+                        </th>
+                        <th class="quotationValue">
+                        </th>
+
+
+
+                    </tr>
+
+                    <tr>
+                        <th class="quotationField">
+                            {!$Label.ACE_Vehicle_Color}:
+                        </th>
+                        <th class="quotationValue">
+                            {!listOfOpportunities[0].OpportunityLineItems[0].Product2.Colour__c}
+                        </th>
+                        <th class="quotationField">
+                            {!$Label.ACE_Vehicle_Model_Code}:
+                        </th>
+                        <th class="quotationValue">
+                            {!listOfOpportunities[0].OpportunityLineItems[0].Product2.ProductCode}
+                        </th>
+
+                    </tr>
+                </table>
+                <br/>
+
+                <div class="header">
+                    <h1 class="headerInner">
+                        {!$Label.ACE_Order_Details}
+                    </h1>
+                </div>
+                <table>
+                    <tr>
+                        <th class="quotationField">
+                            {!$Label.ACE_Booking_Name}:
+                        </th>
+                        <th class="quotationValue">
+                            {!ACE_Booking__c.Name}
+                        </th>
+                        <th class="quotationField">
+                            {!$Label.ACE_Order_Date}:
+                        </th>
+                        <th class="quotationValue">
+                            <apex:outputText value="{0,date,MM'/'dd'/'yyyy}">
+                                <apex:param value="{!ACE_Booking__c.Order_Date__c}" />
+                            </apex:outputText>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th class="quotationField">
+                            {!$Label.ACE_Registration_By}:
+                        </th>
+                        <th class="quotationValue">
+                            {!ACE_Booking__c.Registration_By__c}
+                        </th>
+                        <th class="quotationField">
+                            {!$Label.ACE_Registration_Types}:
+                        </th>
+                        <th class="quotationValue">
+                            {!ACE_Booking__c.Registration_Types__c }
+                        </th>
+                    </tr>
+                    <tr>
+                        <th class="quotationField">
+                            {!$Label.ACE_Insured_By}:
+                        </th>
+                        <th class="quotationValue">
+                            {!ACE_Booking__c.Insurance_By__c}
+                        </th>
+                        <th class="quotationField">
+                            {!$Label.ACE_Insurance_Company}:
+                        </th>
+                        <th class="quotationValue">
+                            {!ACE_Booking__c.Insurance_Company__c}
+                        </th>
+                    </tr>
+                    <tr>
+                        <th class="quotationField">
+                            {!$Label.ACE_Insurance_Types}:
+                        </th>
+                        <th class="quotationValue">
+                            {!ACE_Booking__c.Insurance_Types__c}
+                        </th>
+                        <th class="quotationField">
+                            {!$Label.ACE_Sheild_Warranty}:
+                        </th>
+                        <th class="quotationValue">
+                            {!ACE_Booking__c.Shield_Warranty__c}
+                        </th>
+                    </tr>
+                    <tr>
+                        <th class="quotationField">
+                            {!$Label.ACE_Delivery_Location}:
+                        </th>
+                        <th class="quotationValue">
+                            {!ACE_Booking__c.Delivery_Location__c}
+                        </th>
+                        <th class="quotationField">
+                            {!$Label.ACE_Customer_Expected_Delivery_Date}:
+                        </th>
+                        <th class="quotationValue">
+                            <apex:outputText value="{0,date,MM'/'dd'/'yyyy}">
+                                <apex:param value="{!ACE_Booking__c.Customer_Expected_Delivery_Date__c}" />
+                            </apex:outputText>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th class="quotationField">
+                            {!$Label.ACE_Committed_Delivery_Date}:
+                        </th>
+                        <th class="quotationValue">
+                            <apex:outputText value="{0,date,MM'/'dd'/'yyyy}">
+                                <apex:param value="{!ACE_Booking__c.Committed_Delivery_Date__c}" />
+                            </apex:outputText>
+                        </th>
+                        <th class="quotationField">
+                            {!$Label.ACE_Committed_Delivery_Week}:
+                        </th>
+                        <th class="quotationValue">
+                            {!ACE_Booking__c.Committed_Delivery_Week__c }
+                        </th>
+                    </tr>
+                </table>
+                <br/>
+
+                <div class="header">
+                    <h1 class="headerInner">
+                        {!$Label.ACE_Booking_Details}
+                    </h1>
+                </div>
+                <table>
+                    <tr>
+                        <th class="quotationField">
+                            {!$Label.ACE_Booking_Amount}:
+                        </th>
+                        <th class="quotationValue">
+                            {!ACE_Booking__c.Booking_Amount__c}
+                        </th>
+                        <th class="quotationField">
+                            {!$Label.ACE_Mode_Of_Payment}:
+                        </th>
+                        <th class="quotationValue">
+                            {!ACE_Booking__c.Mode_OF_Payment__c }
+                        </th>
+                    </tr>
+                    <tr>
+                        <th class="quotationField">
+                            {!$Label.ACE_Cheque_Details}:
+                        </th>
+                        <th class="quotationValue">
+                            {!ACE_Booking__c.Cheque_DD_PO_Details__c }
+                        </th>
+                        <th class="quotationField">
+                            {!$Label.ACE_Amount_Recieved}:
+                        </th>
+                        <th class="quotationValue">
+                            {!ACE_Booking__c.Amount_Received__c }
+                        </th>
+                    </tr>
+                    <tr>
+                        <th class="quotationField">
+                            {!$Label.ACE_Drawn_On}:
+                        </th>
+                        <th class="quotationValue">
+                            {!ACE_Booking__c.Drawn_On__c }
+                        </th>
+                        <th class="quotationField">
+                            {!$Label.ACE_Amount_Recieved_Date}:
+                        </th>
+                        <th class="quotationValue">
+                            {!ACE_Booking__c.Amount_Received_Date__c }
+                        </th>
+                    </tr>
+                    <tr>
+                        <th class="quotationField">
+                            {!$Label.ACE_Drawn_Date}:
+                        </th>
+                        <th class="quotationValue">
+                            <apex:outputText value="{0,date,MM'/'dd'/'yyyy}">
+                                <apex:param value="{!ACE_Booking__c.Drawn_Date__c}" />
+                            </apex:outputText>
+                        </th>
+                    </tr>
+                </table>
+                <br/>
+
+                <div class="header">
+                    <h1 class="headerInner">
+                        {!$Label.ACE_Finance_Details}
+                    </h1>
+                </div>
+                <table>
+                    <tr>
+                        <th class="quotationField">
+                            {!$Label.ACE_Finance_Arranged_By}:
+                        </th>
+                        <th class="quotationValue">
+                            {!ACE_Booking__c.Finance_Arranged_By__c}
+                        </th>
+                        <th class="quotationField">
+                            {!$Label.ACE_Loan_Amount}:
+                        </th>
+                        <th class="quotationValue">
+                            {!ACE_Booking__c.Loan_Amount__c }
+                        </th>
+                    </tr>
+                    <tr>
+                        <th class="quotationField">
+                            {!$Label.ACE_Finance_Company}:
+                        </th>
+                        <th class="quotationValue">
+                            {!ACE_Booking__c.Finance_Company__c}
+                        </th>
+                        <th class="quotationField">
+                            {!$Label.ACE_Tenure}:
+                        </th>
+                        <th class="quotationValue">
+                            {!ACE_Booking__c.Tenure__c }
+                        </th>
+                    </tr>
+                    <tr>
+                        <th class="quotationField">
+                            {!$Label.ACE_Interest_Rates}:
+                        </th>
+                        <th class="quotationValue">
+                            {!ACE_Booking__c.Interest_Rates__c}
+                        </th>
+                        <th class="quotationField">
+                            {!$Label.ACE_Down_Payment}:
+                        </th>
+                        <th class="quotationValue">
+                            {!ACE_Booking__c.Down_Payment__c }
+                        </th>
+                    </tr>
+                    <tr>
+                        <th class="quotationField">
+                            {!$Label.ACE_Expected_EMI}:
+                        </th>
+                        <th class="quotationValue">
+                            {!ACE_Booking__c.Expected_EMI_Amount__c}
+                        </th>
+                    </tr>
+                </table>
+                <br/>
+                <!-- DISCLAIMER -->
+                <hr/>
+                <div>
+                    <div class="Disclaimer">
+                        {!$Label.ACE_Disclaimer}
+                    </div>
+                    <hr/>
+                    <div id="disclaimer" class="disclaimerText">
+                        <!--{!Disclaimer}-->
+                    </div>
+                    <br/>
+                </div>
+                <hr/>
+                <!-- Terms and Conditions -->
+                <div id="TnCHead">
+                    <div class="Disclaimer">
+                        {!$Label.ACE_Terms_and_Conditions}
+                    </div>
+                    <hr/>
+
+                    <div id="TnCContent">
+                        <!--<apex:repeat value="{!terms}" var="term">
+
+                            {!term}
+                            <br/>
+                        </apex:repeat>-->
+                    </div>
+                    <br/>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="footer">
+        <div>
+
+        </div>
+    </div>
+</apex:page>

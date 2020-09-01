@@ -1,0 +1,8 @@
+.THIS .Next{
+        float: right;
+        margin-top: 50px;
+}
+.THIS .Previous{
+        float: left;
+        margin-top: 50px;
+}

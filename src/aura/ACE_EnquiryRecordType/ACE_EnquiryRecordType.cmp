@@ -1,0 +1,13 @@
+<aura:component implements="force:hasRecordId,lightning:actionOverride,lightning:hasPageReference">
+    <!--Declare Attributes-->
+    <aura:attribute name="selectedRecordId" type="Id" />
+
+    <!--Declare Handler-->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+
+    <!--Component Start-->
+    <div class="slds-m-around--xx-large">
+        Selected Record Type Id : {!v.selectedRecordId}
+    </div>
+    <!--Component End-->
+</aura:component>

@@ -1,0 +1,83 @@
+<aura:component implements="force:lightningQuickAction" controller="ACE_AssignDealer" >
+    
+    <aura:attribute name="Product_Interest" type="list" />
+    <aura:attribute name="leadRecord" type="Lead" />
+    <aura:attribute name="cityName" type="string" />
+    <aura:attribute name="allDealer" type="Account[]" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:registerEvent name="clsPopupEvent" type="c:ACE_CloseParentFromChild" />
+    <!-- <div class="container">-->
+    <aura:html tag="style">
+        .slds-modal__container {
+        width : 75% !important;
+        max-width: unset !important;
+        }
+    </aura:html>
+    <div class="slds">
+       
+        <br></br>
+        <table class="slds-table slds-table--bordered slds-table--striped">
+            <thead>
+                <tr>
+                    <th scope="col" style = "text-align:center;"><span class="slds-truncate">S.No.</span></th>
+                    <th scope="col" style = "text-align:center;"><span class="slds-truncate">Model</span></th>
+                  <!--  <th scope="col"><span class="slds-truncate">Variant</span></th>
+                    <th scope="col"><span class="slds-truncate">Color</span></th> -->
+                    <th scope="col" style = "text-align:center;"><span class="slds-truncate">Primary Interest</span></th>
+                    <th scope="col" style = "text-align:center;"><span class="slds-truncate">Other Interest</span></th>
+                    <th scope="col" style = "text-align:center;"><span class="slds-truncate">Not Interested</span></th>
+                 
+                    <th scope="col" style = "text-align:center;"><span class="slds-truncate">Dealer</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                <aura:iteration items="{!v.Product_Interest}" var="Product" indexVar="index" >
+                    <tr>
+                        <td style = "text-align:center;">{!index+1}</td>
+                        <td style = "text-align:center;">{!Product.interestedModel.Name}</td>
+                      <!--  <td>
+                            <lightning:select name="{!index}" class="label-hidden" aura:id="Variant"  value="{!Product.interestedModel.Vehicle_Variant__c}" onchange="{!c.changeVariant}"   >
+                                <option value="">choose one...</option>
+                                <aura:iteration items="{!Product.allVariant}" var="Variant" indexVar="indexVariant" >
+                                    <option value="{!Variant.Id}" id="{!Variant.Name}" selected="{!Product.interestedModel.Vehicle_Variant__c == Variant}">{!Variant.Name}</option>
+                                </aura:iteration>
+                            </lightning:select>
+                        </td>
+                        <td>
+                            
+                            
+                            <lightning:select name="{!index}" class="label-hidden" value="{!Product.interestedModel.Vehicle_Colors__c}"  >
+                                <option value="">choose one...</option>
+                                <aura:iteration items="{!Product.selectedColors}" var="valuewithProduct" >
+                                    <option value="{!valuewithProduct}">{!valuewithProduct}</option>
+                                </aura:iteration>
+                            </lightning:select>
+                            
+                        </td> -->
+                       
+                        <aura:iteration items="{!Product.Interested}" var="Interested" indexVar="Interestedindex" >
+                            <td style="padding-top: 10px;text-align:center;">
+                                <input type="checkbox" class="radio" id="{!Interestedindex}" value="{!index}" onchange="{!c.checkboxSelect}" checked="{!Interested.data}"  />
+                            </td>
+                        </aura:iteration>
+                        <td  style = "text-align:center;">
+                            <lightning:select name="selectDealer" class="label-hidden" value="{!Product.interestedModel.Dealer_Name__c}">
+                                <option value="">choose one...</option>
+                                <aura:iteration items="{!v.allDealer}" var="Dealer" indexVar="index" >
+                                    <option value="{!Dealer.Id}">{!Dealer.Name}</option>
+                                </aura:iteration>
+                            </lightning:select>
+                        </td>
+                    </tr>
+                </aura:iteration>
+            </tbody>
+        </table>
+        <br></br>
+        <footer class="slds-modal__footer">
+            <div class ="slds-grid slds-grid_align-end">
+        	<button class="slds-button slds-button_brand" style="float: right;" onclick="{!c.closeModel}">Cancel</button>
+        	<button class="slds-button slds-button_brand " style="    float: right;"  onclick="{!c.saveData}">Assign</button>
+            </div>
+        </footer>    
+    </div>
+</aura:component>

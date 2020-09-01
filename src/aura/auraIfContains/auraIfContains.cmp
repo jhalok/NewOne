@@ -1,0 +1,24 @@
+<!--
+auraIfContains.cmp
+Description: This is geneic component can be used in replacement of aura:if when contain expression is needed. 
+-->
+<aura:component >    
+ 	
+    <aura:attribute name="checkCaseSensitivity" type="Boolean" default="true" description="Only Applicable to Simple String."/>
+    <aura:attribute name="items" type="List" description="List of elements"/>
+    <aura:attribute name="element" type="String" description="elements to compare in the list"/>
+    <aura:attribute name="isElementFound" type="Boolean" />
+    <aura:attribute name="chkIfNotContains" type="Boolean" default="false"/>
+    
+    <aura:handler name="change" value="{!v.items}" action="{!c.doInit}"/>
+    <aura:handler name="change" value="{!v.element}" action="{!c.doInit}"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    
+    <aura:if isTrue="{! !v.chkIfNotContains &amp;&amp; v.isElementFound}">
+        {!v.body}
+    </aura:if>
+    <aura:if isTrue="{! v.chkIfNotContains &amp;&amp; !v.isElementFound}">
+        {!v.body}
+    </aura:if>
+</aura:component>

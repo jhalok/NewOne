@@ -1,0 +1,8 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:handler name="init" value="{!this}" action="{!c.doinit}" />
+    <aura:attribute name="logoImageURL" type="String" />
+    <div>
+        <img src = "{!v.logoImageURL}" style="height:200px;width:300px;">
+        </img>
+    </div>
+</aura:component>

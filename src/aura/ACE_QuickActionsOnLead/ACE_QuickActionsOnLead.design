@@ -1,0 +1,10 @@
+<design:component>
+    <design:attribute name="showExistingVehicle" label="showExistingVehicle" />
+    <design:attribute name="showAssignDealer" label="showAssignDealer" />
+    <design:attribute name="showTD" label="showTD" />
+    <design:attribute name="showCloseCall" label="showCloseCall" />
+    <design:attribute name="showLinkContact" label="showLinkContact" />
+    <design:attribute name="showAddCompetitor" label="showAddCompetitor" />
+    <design:attribute name="showProductInterest" label="showProductInterest" />
+
+</design:component>

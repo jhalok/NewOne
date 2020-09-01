@@ -1,0 +1,335 @@
+<apex:page showHeader="false" controller="GetRoute" standardStylesheets="false" title="mapRoute">
+    
+    <html>
+        <head>
+            <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+            <meta charset="utf-8" />
+            <title>Directions Service</title>
+            <style>
+                /* Always set the map height explicitly to define the size of the div
+                * element that contains the map. */
+                #map {
+                height: 300px;
+                }
+                /* Optional: Makes the sample page fill the window. */
+                html, body {
+                height: 300px;
+                margin: 0;
+                padding: 0;
+                }
+                #floating-panel {
+                position: absolute;
+                top: 10px;
+                left: 25%;
+                z-index: 5;
+                background-color: #fff;
+                padding: 5px;
+                border: 1px solid #999;
+                text-align: center;
+                font-family: 'Roboto','sans-serif';
+                line-height: 30px;
+                padding-left: 10px;
+                }
+                
+                html, body, #map-canvas {
+                height: 300px;
+                margin: 0px;
+                padding: 0px
+                }
+                .controls {
+                margin-top: 16px;
+                border: 1px solid transparent;
+                border-radius: 2px 0 0 2px;
+                box-sizing: border-box;
+                -moz-box-sizing: border-box;
+                height: 32px;
+                outline: none;
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+                }
+                
+                #autocomplete {
+                background-color: #fff;
+                font-family: Roboto;
+                font-size: 15px;
+                font-weight: 300;
+                margin-left: 12px;
+                padding: 0 11px 0 13px;
+                text-overflow: ellipsis;
+                width: 400px;
+                left: 10% !important;
+                top: 9%!important;
+                padding: 6px!important;
+                }
+                
+                #autocomplete:focus {
+                border-color: #4d90fe;
+                }
+                
+                .pac-container {
+                font-family: Roboto;
+                }
+                
+                #type-selector {
+                color: #fff;
+                background-color: #4d90fe;
+                padding: 5px 11px 0px 11px;
+                }
+                
+                #type-selector label {
+                font-family: Roboto;
+                font-size: 13px;
+                font-weight: 300;
+                }
+                
+            </style>
+        </head>
+        <body>
+            
+            <input id="autocomplete" placeholder="Enter a city" type="text" />
+            <div id="map"></div>
+            <script>
+            var url_string = window.location.href;
+            var url = new URL(url_string);
+            var city = url.searchParams.get("city");
+            
+            var marker = null;
+            var map, places, infoWindow;
+            var markers = [];
+            var autocomplete;
+            var countryRestrict = {'country': 'ind'};
+            var p1;
+            //"https://mahindradealerworld--acedev.lightning.force.com";
+            var lexOrigin = '{!$Label.Lightning_Domain_Url}';
+
+            
+            function initMap() {
+                var directionsService = new google.maps.DirectionsService();
+                var directionsRenderer = new google.maps.DirectionsRenderer();
+                
+                var input = (document.getElementById('autocomplete'));
+                var map = new google.maps.Map(document.getElementById('map'), {
+                    zoom: 10,
+                    center: new google.maps.LatLng(26.9124336,75.78727090000007),
+                    mapTypeControl: false,
+                    panControl: false,
+                    zoomControl: false,
+                    streetViewControl: false
+                });
+                map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+                autocomplete = new google.maps.places.Autocomplete((document.getElementById('autocomplete')),{types: ['(cities)'],componentRestrictions: countryRestrict
+                                                                                                             });
+                var geocoder = new google.maps.Geocoder();
+                geocodeAddress(geocoder, map,city)
+                places = new google.maps.places.PlacesService(map);
+                autocomplete.addListener('place_changed', onPlaceChanged);
+                
+
+                function setAutocompleteCountry() {
+                    
+                    autocomplete.setComponentRestrictions({'country': 'india'});
+                    map.setCenter(new google.maps.LatLng(75.78727090000007,26.9124336));
+                    map.setZoom(10);
+                }
+                
+                function dropMarker(i) {
+                    console.log('#I####='+i);
+                    return function() {
+                        console.log(i+'#markers='+markers[i]);
+                        console.log('*****map='+map);
+                        markers[i].setMap(map);
+                    };
+                }
+                function geocodeAddress(geocoder, resultsMap,add) {
+                    var address = add;
+                    console.log('Address='+address);
+                    //console.log('Address-CITY='+address.locality);
+                    
+                    geocoder.geocode({'address': address}, function(results, status) {
+                        if (status === 'OK') {
+                            
+                            var newPoint = new google.maps.LatLng(results[0].geometry.location.lat(),results[0].geometry.location.lng());
+                            console.log('UNtyped--newPoint='+newPoint);
+                            console.log('UNtyped--lat='+results[0].geometry.location.lat()+'--long='+results[0].geometry.location.lng());
+                            var selectedCity=getCityNameFromPlace(results[0]);
+                            var defaultMsg= results[0].geometry.location.lat()+'_;_'+results[0].geometry.location.lng()+'_;_'+selectedCity;
+                            sendMessageToLC(defaultMsg);
+                            
+                            marker = new google.maps.Marker({
+                                position: newPoint,
+                                 draggable:true,
+                                map: map,
+                                title: 'testing',
+                                animation: google.maps.Animation.DROP,
+                            });
+                            map.setCenter(newPoint);
+                            map.setZoom(10);
+                            
+                            marker.setMap(map);
+                            //sd
+                            google.maps.event.addListener(marker, 'dragstart', function() {
+                                console.log('Drag started...');
+                            });
+                            
+                            google.maps.event.addListener(marker, 'drag', function() {
+                                console.log('Dragging...');
+                            });
+                            
+                            google.maps.event.addListener(marker, 'dragend', function() {
+                                console.log('Drag ended');
+                                console.log('lat='+marker.getPosition().lat()); 
+                                console.log('lng='+marker.getPosition().lng());
+                                geocoder.geocode({latLng : marker.getPosition()}, reverseGeocodeResult);
+                                //var message= marker.getPosition().lat()+'_;_'+marker.getPosition().lng()+'_;_'+selectedCity;
+                                //sendMessageToLC(message);
+                            });
+                            //sd
+                        }
+                    });
+                   
+                    geocoder.geocode({'address': '303007'}, function(results, status) {
+                        if (status === 'OK') {
+                            var p1 = results[0].geometry.location;
+                            console.log('p1=>'+p1);
+                            geocoder.geocode({'address': '302020'}, function(results1, status1) {
+                                if (status1 === 'OK') {
+                                    var   p2 = results1[0].geometry.location;
+                                    console.log('p2=>'+p2);
+                                    console.log(getDistance(p1,p2)); 
+                                    function rad(x) {
+                                        return x * Math.PI / 180;
+                                    };
+                                    
+                                    function getDistance(p1, p2) {
+                                        var R = 6378137; // Earth’s mean radius in meter
+                                        var dLat = rad(p2.lat() - p1.lat());
+                                        var dLong = rad(p2.lng() - p1.lng());
+                                        var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                                            Math.cos(rad(p1.lat())) * Math.cos(rad(p2.lat())) *
+                                            Math.sin(dLong / 2) * Math.sin(dLong / 2);
+                                        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+                                        var d = R * c;
+                                        return d / 1000; // returns the distance in meter
+                                    };
+                                    
+                                } else {
+                                    alert('Geocode was not successful for the following reason: ' + status1);
+                                }
+                            });
+                            
+                        } else {
+                            alert('Geocode was not successful for the following reason: ' + status);
+                        }
+                    });
+                    
+                    
+                }
+                function onPlaceChanged() {
+                    var place = autocomplete.getPlace();
+                    console.log('place--->'+place);
+                    if (place.geometry) {
+                        var geocoder = new google.maps.Geocoder();
+                        geocodeAddress(geocoder, map,place)
+                        if (marker && marker.setMap) {
+                            marker.setMap(null);
+                        }
+                        
+                        var newPoint = new google.maps.LatLng(place.geometry.location.lat(),place.geometry.location.lng());
+                        console.log('typed--newPoint='+newPoint);
+                        console.log('typed--lat='+place.geometry.location.lat()+'--long='+place.geometry.location.lng());
+                        var selectedCity=getCityNameFromPlace(place);
+                        var chngMsg= place.geometry.location.lat()+'_;_'+place.geometry.location.lng()+'_;_'+selectedCity;
+                        sendMessageToLC(chngMsg);
+                        
+                        marker = new google.maps.Marker({
+                            position: newPoint,
+                            map: map,
+                            draggable:true,
+                            title: 'testing',
+                            animation: google.maps.Animation.DROP,
+                        });
+                        map.setCenter(newPoint);
+                        map.setZoom(10);
+                        
+                        marker.setMap(map);
+                        
+                        //sd
+                            google.maps.event.addListener(marker, 'dragstart', function() {
+                                console.log('Drag started...');
+                            });
+                            
+                            google.maps.event.addListener(marker, 'drag', function() {
+                                console.log('Dragging...');
+                            });
+                            
+                            google.maps.event.addListener(marker, 'dragend', function() {
+                                console.log('Drag ended');
+                                console.log('lat='+marker.getPosition().lat()); 
+                                console.log('lng='+marker.getPosition().lng());
+                                geocoder.geocode({latLng : marker.getPosition()}, reverseGeocodeResult);
+                                //var message= marker.getPosition().lat()+'_;_'+marker.getPosition().lng()+'_;_'+selectedCity;
+                                //sendMessageToLC(message);
+                            });
+                            //sd
+                        
+                    } else {
+                        document.getElementById('autocomplete').placeholder = 'Enter a city';
+                    }
+                } 
+                
+                function sendMessageToLC(message){
+                    parent.postMessage(message, lexOrigin);
+                    console.log('message='+message+'-;-lexOrigin='+lexOrigin);
+                }
+                
+                function getCityNameFromPlace(place){
+                    console.log('Formatted Address='+place.formatted_address);
+                    var selCity='';
+                    for (var outCnt=0; outCnt<place.address_components.length; outCnt++) {
+                        for (var inCnt=0;inCnt<place.address_components[outCnt].types.length;inCnt++) {
+                            //administrative_area_level_2
+                            if (place.address_components[outCnt].types[inCnt] == "locality") {
+                                //this is the object you are looking for
+                                selCity= place.address_components[outCnt];
+                                break;
+                            }
+                        }
+                    }
+                    if(selCity!=null /*&& selCity.long_name!=undefined*/){
+                        console.log(selCity.short_name + " - " + selCity.long_name);
+                        if(selCity.long_name!=undefined && selCity.long_name!=null)
+                            return selCity.long_name;
+                        else return 'Invalid Location.'
+                    }
+                    return '';
+                }
+                
+                function reverseGeocodeResult(results, status) {
+                    currentReverseGeocodeResponse = results;
+                    if (status == 'OK') {
+                        if (results.length == 0) {
+                            alert('Invalid City/Location.');
+                        } else {
+                            console.log(results[0].formatted_address);
+                            var latitud= results[0].geometry.location.lat();
+                            var longitud= results[0].geometry.location.lng();
+                            var pinCity= getCityNameFromPlace(results[0]);
+                            var message= latitud+'_;_'+longitud+'_;_'+pinCity ;
+                            sendMessageToLC(message);
+                        }
+                    } else {
+                        alert("Invalid Location.");
+                    }
+                }
+            }
+            
+            
+            
+            
+            
+            
+            </script>
+            <script  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAcC43SdohkxbJicShwm2j7fK42zoPdA-Q&libraries=places&callback=initMap&">
+            </script>
+        </body>
+    </html>
+</apex:page>

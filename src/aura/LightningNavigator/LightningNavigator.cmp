@@ -1,0 +1,12 @@
+<aura:component implements="lightning:backgroundUtilityItem" access="global">
+	<aura:attribute name="notifications" type="List"/>
+    <aura:attribute name="isMuted" type="Boolean" default="false"/>
+    <aura:handler name="init" value="{!this}" action="{!c.onInit}"/>
+    <aura:registerEvent name="toastEvent" type="force:showToast"/>
+    <lightning:empApi aura:id="empApi"/>
+    <aura:attribute name="channel" type="String" default="/event/ACE_Inbound_Call__e"/>
+    <aura:attribute name="subscription" type="Map"/>
+    <lightning:utilityBarAPI aura:id="utilitybar" />
+    <lightning:navigation aura:id="navService"/>
+    <aura:attribute name="pageReference" type="Object"/>
+</aura:component>

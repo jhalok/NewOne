@@ -1,0 +1,13 @@
+<aura:component controller="ACE_LeadCustomActionVisibilityController" implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" access="global">
+        <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+        <lightning:overlayLibrary aura:id="overlayLib"/>
+        <lightning:card>
+            <div class="slds-button-group" role="group">
+                <lightning:button class="slds-button slds-button_neutral slds-button_first" aura:id="testDrive" variant="neutral" label="Schedule Test Drive" onclick="{!c.callSaveComp}"/>
+                <lightning:button class = "slds-button slds-button_neutral slds-button_middle" aura:id="addDealer" variant="neutral" label="Add Dealer" onclick="{!c.callSaveComp}"/>
+                <lightning:button class = "slds-button slds-button_neutral slds-button_middle" aura:id="closeCall" variant="neutral" label="Close Call" onclick="{!c.callSaveComp}"/>
+                <lightning:button class = "slds-button slds-button_neutral slds-button_middle" aura:id="existingVehicle" variant="neutral" label="Add Existing Vehicles" onclick="{!c.callSaveComp}"/>
+                <lightning:button class="slds-button slds-button_neutral slds-button_last" aura:id="updatePI" variant="neutral" label="Update Interest" onclick="{!c.callSaveComp}"/>
+            </div>
+        </lightning:card>
+</aura:component>

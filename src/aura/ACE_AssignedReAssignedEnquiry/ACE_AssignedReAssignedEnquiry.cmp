@@ -1,0 +1,60 @@
+<aura:component controller="ACE_UnassignedReassignedController"
+    implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction"
+    access="global">
+    <aura:handler name="init" value="{!this}" action="{!c.doinit}" />
+    <aura:attribute name="modelData" type="list" />
+    <aura:attribute name="selTabId" type="String" default="tab2" />
+
+    <aura:attribute name="optionsLaunchType" type="List" default="[
+                                                        {'label': 'Launch', 'value': 'Launch'},
+                                                        {'label': 'PreLaunch', 'value': 'PreLaunch'}
+                                                        ]" />
+    <aura:attribute name="optionsObjectType" type="List" default="[
+                                                        {'label': 'Enquiry', 'value': 'Enquiry'},
+                                                        {'label': 'Quick Enquiry', 'value': 'Quick Enquiry'}
+                                                        ]" />
+    <aura:attribute name="launchType" type="String" default="Launch" />
+    <aura:attribute name="objectType" type="String" default="Enquiry" />
+    <aura:attribute name="modelType" type="String" default="None" />
+    <aura:attribute name="modelList" type="List" default="None" />
+
+    <lightning:tabset onselect="{!c.tabSelected}" variant="default" selectedTabId="{!v.selTabId}">
+
+        <lightning:layout pullToBoundary="medium">
+            <lightning:layoutItem flexibility="auto" padding="horizontal-medium">
+                <div class="custom-box slds-p-left_large modalDiv">
+                    <lightning:radioGroup name="launchType" label="Vehicle Type" options="{! v.optionsLaunchType }"
+                        value="{! v.launchType }" type="radio" required="true" onchange="{!c.handleClickLaunchType}" />
+                </div>
+            </lightning:layoutItem>
+            <lightning:layoutItem flexibility="auto" padding="horizontal-medium">
+                <div class="custom-box slds-p-left_large modalDiv">
+                    <lightning:radioGroup name="ObjectType" label="Enquiry Type" options="{! v.optionsObjectType }"
+                        value="{! v.objectType }" type="radio" required="true" onchange="{!c.handleClick}" />
+                </div>
+            </lightning:layoutItem>
+            <lightning:layoutItem flexibility="auto" padding="horizontal-medium">
+                <div class="custom-box">
+                    <lightning:select label="Select Model" aura:id="select" class="slds-p-top_large slds-size_4-of-8"
+                        onchange="{! c.onChange }">
+                        <option value="None">All</option>
+                        <aura:iteration items="{!v.modelData}" var="opt">
+                            <option value="{!opt}">{!opt}</option>
+                        </aura:iteration>
+                    </lightning:select>
+                </div>
+            </lightning:layoutItem>
+        </lightning:layout>
+
+        <!--<lightning:tab label="UNASSIGNED ENQUIRY" aura:id="tab1" tabindex="1" id="tab1" title="ASSIGNED">
+            <c:Opportunity_EditListView aura:id="childComp1" launchType="{!v.launchType}" objectType="{!v.objectType}"
+                modelType="{!v.modelType}" />
+        </lightning:tab>-->
+
+        <lightning:tab label="UNASSIGNED ENQUIRY" aura:id="tab2" tabindex="2" id="tab2" title="REASSIGNED">
+            <c:ACE_ReAssignedEnquiry aura:id="childComp2" launchType="{!v.launchType}" objectType="{!v.objectType}" modelType="{!v.modelType}" modelData="{!v.modelData}"/>
+          
+        </lightning:tab>
+    </lightning:tabset>
+
+</aura:component>

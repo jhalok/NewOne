@@ -1,0 +1,259 @@
+<aura:component controller="ACE_BookingContactController"
+                implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickActionWithoutHeader,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" 
+                access="global" >
+    
+    <!--Attributes are defined here to define the object instances -->
+    <aura:attribute name="contactdata" type="Contact" default="{'sobjectType' : 'Contact'}"/>
+    <aura:attribute name="recordId" type="Id"  />
+    <aura:attribute name="opptydata" type="Opportunity"/>
+    <aura:attribute name="opptydatas" type="object"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="booking_id" type="String" />
+    <aura:attribute name="activeSections" type="List" default="['customer','Order','booking','finance']" />
+    <aura:attribute name="activeSectionsMessage" type="String" default="" />
+    <aura:attribute name = "showPdf" type = "Boolean" default = "true"/>
+    <aura:attribute name ="bookingId" type="String" default="0Q05D000000PKGwSAO"/>
+    <aura:attribute name ="custId" type="String"/>
+    <aura:attribute name ="bookingPDFURL" type="String" />
+    <aura:attribute name = "doneCalculations" type="Boolean" default = "false"/>
+    
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="insuranceTypes" type="List" default="[
+                                                               {'label': 'Comprehensive', 'value': 'Comprehensive'},
+                                                               {'label': 'Nil Dept.', 'value': 'Nil Dept.'}
+                                                               ]"/>
+    <aura:attribute name="insType" type="String" default="Comprehensive" />
+    <aura:attribute name="insuredBy" type="List" default="[
+                                                          {'label': 'Dealer', 'value': 'Dealer'},
+                                                          {'label': 'Self', 'value': 'Self'}
+                                                          ]"/>
+    <aura:attribute name="insBy" type="String" default="Dealer"/>
+    <aura:attribute name="registeredBy" type="List" default="[
+                                                             {'label': 'Dealer', 'value': 'Dealer'},
+                                                             {'label': 'Self', 'value': 'Self'}
+                                                             ]"/>
+    <aura:attribute name="regBy" type="String" default="Dealer" />
+    <aura:attribute name="financeArrangedBy" type="List" default="[
+                                                                  {'label': 'Dealer', 'value': 'Dealer'},
+                                                                  {'label': 'Self', 'value': 'Self'}
+                                                                  ]"/>
+    <aura:attribute name="regType" type="String" default="Personal" />
+    <aura:attribute name="registrationType" type="List" default="[
+                                                                 {'label': 'Personal', 'value': 'Personal'},
+                                                                 {'label': 'Commercial', 'value': 'Commercial'}
+                                                                 ]"/>
+    <aura:attribute name="FinArrBy" type="String" default="Dealer" />
+    
+    <aura:if isTrue = "{!v.showPdf}">    
+        <lightning:accordion allowMultipleSectionsOpen="true"
+                             onsectiontoggle="{! c.handleSectionToggle}"
+                             activeSectionName="{! v.activeSections }">
+            
+            <!--Display Contact data -->   
+            <lightning:accordionSection name="customer" label="Customer Information">
+                <force:recordData aura:id="optyRecord" 
+                                  fields="Id,Name,ContactId,AccountId"
+                                  recordId="{!v.recordId}" 
+                                  targetFields="{!v.opptydata}" 
+                                  layoutType="FULL"/>
+                <lightning:recordViewForm recordId="{!v.opptydata.ContactId}" objectApiName="Opportunity">
+                    <div class="slds-grid slds-wrap">
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning:outputField fieldName="Name" />
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning:outputField fieldName="MobilePhone"/>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning:outputField fieldName="MailingAddress" />
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            Registration Address
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning:outputField fieldName="Email"/>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning:outputField fieldName="PANCard__c"/>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            M&amp;M Limited Corporation
+                        </div><br/>
+                        <div class="slds-col slds-size_1-of-2">
+                            User Name             
+                        </div><br/>
+                        <div class="slds-col slds-size_1-of-2">
+                            Corporate Name
+                        </div><br/>
+                        <div class="slds-col slds-size_1-of-2">
+                            Contact Timing
+                        </div><br/><br/>
+                        <aura:iteration items="{!v.opptydatas}" var="curr"> 
+                            <div class="slds-col slds-size_1-of-2">
+                                <lightning:input name="input1" label="Model" value="{!curr.Product2.Model__c}" readonly="true" />
+                            </div>
+                            <div class="slds-col slds-size_1-of-2">
+                                <lightning:input name="input1" label="Variant" value="{!curr.Product2.Variant__c}" readonly="true" />
+                            </div>
+                            <div class="slds-col slds-size_1-of-2">
+                                <lightning:input name="input1" label="Colour" value="{!curr.Product2.Colour__c}" readonly="true" />
+                            </div>
+                        </aura:iteration>   
+                    </div><br/>
+                </lightning:recordViewForm>
+            </lightning:accordionSection>   
+            
+            <!--Insert Data into the booking object  -->   
+            <lightning:recordEditForm aura:id="BookingCreateForm" 
+                                      objectApiName="ACE_Booking__c"  
+                                      onsubmit="{!c.handleOnSubmit}" 
+                                      onsuccess="{!c.handleSuccess}" 
+                                      onerror="{!c.handleError}" >
+                <lightning:messages />
+                <lightning:accordionSection name="Order" label="Order Details">
+                    <div class="slds-grid slds-wrap">
+                        <div class="slds-col slds-size_1-of-2 slds-hide">
+                            <lightning:inputField aura:id="custId" fieldName="Customer_Id__c" value="{!v.custId}"  />
+                        </div> 
+                        <div class="slds-col slds-size_1-of-2 slds-hide">
+                            <lightning:inputField aura:id="OppId" fieldName="Opportunity__c" value="{!v.opptydata.Id}"/>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning:inputField aura:id="bookingName" fieldName="Name" required="true"/>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning:inputField aura:id="orderDate" fieldName="Order_Date__c"/>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning:radioGroup aura:id="registeredBy"
+                                                  name="registeredBy"
+                                                  label="Registered By"
+                                                  options="{! v.registeredBy }"
+                                                  value="{! v.regBy }"
+                                                  onchange="{! c.handleRegisteredBy }"/>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning:radioGroup aura:id="registerationTypes"
+                                                  name="registerationTypes"
+                                                  label="Registeration Types"
+                                                  options="{! v.registrationType }"
+                                                  value="{! v.regType }"
+                                                  onchange="{! c.handleRegisteredTypes }" />
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning:radioGroup aura:id="insuredBy"
+                                                  name="insuredBy"
+                                                  label="Insured By"
+                                                  options="{! v.insuredBy }"
+                                                  value="{! v.insBy }"
+                                                  onchange="{! c.handleInsuredBy }"/>
+                        </div>  
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning:inputField aura:id="insCompany" fieldName="Insurance_Company__c" />
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning:radioGroup aura:id="insuredTypes"
+                                                  name="insuredTypes"
+                                                  label="Insurance Types"
+                                                  options="{! v.insuranceTypes }"
+                                                  value="{! v.insType }"
+                                                  onchange="{! c.handleInsuranceTypes }"
+                                                  />
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning:inputField aura:id="Stage" fieldName="Stage__c" />
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning:inputField aura:id="shieldWarr" fieldName="Shield_Warranty__c" />
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            Delivery Location
+                            <!-- <lightning:inputField fieldName="Shield_Warranty__c" /> -->
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning:inputField aura:id="expDeliveryDate" fieldName="Customer_Expected_Delivery_Date__c" required="true" />
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning:inputField aura:id="commDeliveryDate" fieldName="Committed_Delivery_Date__c" required="true" />
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning:inputField aura:id="commDeliveryWeek" fieldName="Committed_Delivery_Week__c" required="true" />
+                        </div>
+                    </div><br/>
+                </lightning:accordionSection>
+                <lightning:accordionSection name="booking" label="Booking Details">
+                    <div class="slds-grid slds-wrap">
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning:inputField aura:id="bookAmt" fieldName="Booking_Amount__c"  required="true" />
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning:inputField aura:id="payMode" fieldName="Mode_OF_Payment__c" />
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning:inputField aura:id="payDetail" fieldName="Cheque_DD_PO_Details__c" />
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning:inputField aura:id="amtRecieved" fieldName="Amount_Received__c" required="true"/>
+                        </div>		
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning:inputField aura:id="drawnOn" fieldName="Drawn_On__c"/>    
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning:inputField aura:id="amtRecDate" fieldName="Amount_Received_Date__c" required="true"/>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning:inputField aura:id="drawDate" fieldName="Drawn_Date__c" required="true"/>
+                        </div>
+                    </div><br/>    
+                </lightning:accordionSection>
+                <lightning:accordionSection name="finance" label="Finance Details">  
+                    <div class="slds-grid slds-wrap">
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning:radioGroup aura:id="financeArrangedBy"
+                                                  name="financeArrangedBy"
+                                                  label="Finance Arranged By"
+                                                  options="{! v.financeArrangedBy }"
+                                                  value="{! v.FinArrBy }"
+                                                  onchange="{! c.handleFinanceArrangedBy }"
+                                                  />
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning:inputField aura:id="loanAmt" fieldName="Loan_Amount__c" required="true"/>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning:inputField aura:id="finCompany" fieldName="Finance_Company__c" />
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning:inputField aura:id="tenure" fieldName="Tenure__c" required="true"/>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning:inputField aura:id="intRate" fieldName="Interest_Rates__c" required="true" />
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning:inputField aura:id="downPay" fieldName="Down_Payment__c"  required="true"/>
+                        </div>
+                        <!--<div class="slds-col slds-size_1-of-2">
+                 <lightning:inputField aura:id="expEMI" fieldName="Expected_EMI__c" required="true"  />
+            </div>-->  
+                        
+                    </div>
+                    <div class="slds-size_1-of-1 ">
+                        <lightning:button type="submit" variant="brand" label="Create Booking" class="slds-m-top_medium" onclick="{!c.handleOnSubmit}" />
+                        <lightning:button type="Cancel" variant="brand" label="Cancel" onclick="{!c.handleClose}" class="slds-m-top_medium"/>
+                    </div>
+                </lightning:accordionSection>
+            </lightning:recordEditForm>             
+        </lightning:accordion>
+        <aura:set attribute ="else">
+            <!-- I frame to show the pdf of geneated booking -->
+            <div id="pdf">
+                <iframe src="{!v.bookingPDFURL}"
+                        width="111%"
+                        height="500px;"
+                        frameborder="0"
+                        target="_blank"/>
+            </div>
+        </aura:set> 
+    </aura:if>
+</aura:component>

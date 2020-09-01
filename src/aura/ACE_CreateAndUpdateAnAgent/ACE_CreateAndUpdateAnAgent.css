@@ -1,0 +1,69 @@
+.THIS .searchSection{
+    
+}
+.THIS .searchSection label{
+    display:none;
+}
+.THIS .searchSection div label{
+    display:none;
+}
+.THIS .updateButton{
+    padding-top: 20px;
+}
+.THIS .createUser tr td{
+    padding: 15px;
+}
+.THIS .createNew{
+    float: right;
+    margin-right: 50px;
+    margin-bottom: 30px;
+}
+.THIS .createHeader{
+    
+    font-size: 20px;
+    text-align: center;
+    font-weight: 600;
+    margin-bottom: 30px;
+}
+.THIS .createUserDiv{
+    padding-bottom:80px !important;
+}
+.THIS .userCreationBution{
+        float: right;
+    margin-right: 0;
+}
+.THIS .statusForSearch{
+    float: left;
+    margin-left: 10px;
+    width: 65%;
+}
+.THIS .dataForSearch{
+     float: left;
+    margin-left: 10px;
+    width: 82%;
+}
+.THIS .resetButton{
+    margin-left: 5px;
+}
+.THIS .userTableHead th{
+    padding:  5px;
+    text-align: center;
+}
+.THIS .userTableTh td{
+    
+}
+.THIS .selectStatus{
+    padding: 0px;
+}
+.THIS .hideLabel label {
+    display: none;
+}
+.THIS .hideLabel label {
+    display: none;
+}
+.THIS  .SelectSize>div>div{
+   width: 25%;
+}
+.THIS  .SelectSize{
+    margin-left: 7%;
+}

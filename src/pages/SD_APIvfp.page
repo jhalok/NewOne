@@ -1,0 +1,10 @@
+<apex:page controller="SD_APItest" action="{!auth_step_2}">
+  <apex:form >
+    <apex:commandButton action="{!auth_Step_1}" value="Start" reRender="results"/>
+  </apex:form>
+  <apex:outputPanel id="results">
+    {!theTokenResponse}
+      <br/>
+      {!theCode}
+  </apex:outputPanel>
+</apex:page>

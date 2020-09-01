@@ -1,0 +1,23 @@
+.THIS.mainDiv{
+    
+    background-color: white;
+}
+.THIS .slds-theme_shade{
+    
+    background-color: rgb(243, 242, 242);
+}
+.THIS .slds-gutters {
+    width: 100%;
+}
+.THIS .slds-section{
+    width: 100%;
+}
+.THIS .slds-modal__container{
+    width: 60% !important;
+    max-width: 65rem;
+}
+.THIS .slds-modal__header{
+    border-bottom: 0px !important;
+    height: 11%;
+    
+}

@@ -1,0 +1,1 @@
+public class ACE_TriggerException extends Exception {}

@@ -1,0 +1,18 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId" access="global" >
+    <aura:attribute name="headerTitle" type="Aura.Component[]">
+        <h2>
+            <b>Customer Persona</b>
+        </h2>
+    </aura:attribute>
+    <lightning:card title="{!v.headerTitle}" iconName="custom:custom84">
+        <p>
+            <ul style="list-style-type:disc;">
+                <div style="padding-left:25px;font-size: 12px"> 
+                <li>Road Presence - Making heads turn</li>
+                <li>Hard top</li>
+                <li>Infotainment</li>
+                </div>
+           </ul>
+        </p>
+    </lightning:card>
+</aura:component>

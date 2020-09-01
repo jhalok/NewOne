@@ -1,0 +1,131 @@
+<aura:component controller="ACE_AddOtherInterests_Controller"
+    implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction"
+    access="global">
+
+    <aura:attribute name="CompetitorsList" type="List[]" />
+    <aura:attribute name="leadId" type="String" />
+    <aura:attribute name="existCompetitorsList" type="Competitors_Considered__c[]" />
+    <aura:attribute name="allMackList" type="String[]" />
+    <aura:attribute name="allModel" type="String[]" />
+    <aura:attribute name="existingLength" type="Integer" />
+    <aura:attribute name="selectedMake" type="string" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:registerEvent name="clsPopupEvent" type="c:ACE_CloseParentFromChild" />
+
+    <div class="slds-modal__container" style="width: 100%; padding:0px;">
+
+        <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+            <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                <thead>
+                    <tr class="slds-text-title_caps">
+                        <th scope="col">
+                            <div class="" style="text-transform: capitalize;text-align:center;">S.No.</div>
+                        </th>
+
+                        <th scope="col">
+                            <div class="" style="text-transform: capitalize;text-align:center;" title="Make">Make</div>
+                        </th>
+                        <th scope="col">
+                            <div class="" style="text-transform: capitalize;text-align:center;" title="Model">Model
+                            </div>
+                        </th>
+                        <th scope="col">
+                            <div class="slds-truncate" style="text-transform: capitalize;text-align:center;"
+                                title=" Action	">Action </div>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <aura:iteration items="{!v.CompetitorsList[0].allExistingCompetitors}" var="item" indexVar="index">
+                        <tr class="slds-text-title_caps">
+                            <td style="padding-top: 15px;text-align:center;">
+                                {!index + 1}
+                            </td>
+                            <td data-label="Interested_In__c" scope="row" style="padding-top: 19px !important; "
+                                class="{!index}" id="{!index}">
+                                <lightning:select name="select1" class="hideLab" value="{!item.Competitor.Make__c}"
+                                    onchange="{!c.getModelForExisting}">
+                                    <option value="">choose one...</option>
+                                    <aura:iteration items="{!v.CompetitorsList[0].allMakes}" var="item">
+                                        <option value="{!item}">{!item}</option>
+                                    </aura:iteration>
+                                </lightning:select>
+                            </td>
+                            <td data-label="Interested_In__c" scope="row" style="padding-top: 19px !important; " class="{!index}">
+
+                                <lightning:select name="select1" class="hideLab" value="{!item.Competitor.Model__c}" onchange="{!c.updateInterast}">
+                                    <option value="">choose one...</option>
+                                    <aura:iteration items="{!item.allModels}" var="Model">
+                                        <option value="{!Model}">{!Model}</option>
+                                    </aura:iteration>
+                                </lightning:select>
+                            </td>
+                            <td style="padding-top: 15px;text-align:center;">
+                                <a onclick="{!c.delExisSingleRow}"  id="{!index}" style="float:left" >
+                                    <lightning:icon variant="error" iconName="utility:delete"
+                                        class="slds-icon slds-icon_small" size="small" alternativeText="Delete Row" />
+                                    <span class="slds-assistive-text">Delete Icon</span>
+                                </a>
+                            </td>
+
+                        </tr>
+                    </aura:iteration>
+                    <aura:iteration items="{!v.CompetitorsList[0].allNewCompetitors}" var="item" indexVar="indexnew">
+                        <tr class="slds-text-title_caps">
+                            <td style="padding-top: 15px;text-align:center;">
+                                {!indexnew + 1 + v.existingLength}
+                            </td>
+
+                            <td data-label="Interested_In__c" scope="row" style="padding-top: 19px !important; "
+                                class="{!indexnew}" id="{!indexnew}">
+                                <lightning:select name="select1" class="hideLab" value="{!item.Competitor.Make__c}"
+                                    onchange="{!c.getModal}">
+                                    <option value="">choose one...</option>
+                                    <aura:iteration items="{!v.CompetitorsList[0].allMakes}" var="item">
+                                        <option value="{!item}">{!item}</option>
+                                    </aura:iteration>
+                                </lightning:select>
+                            </td>
+                            <td data-label="Interested_In__c" scope="row" style="padding-top: 19px !important; " class="{!indexnew}">
+
+                                <lightning:select name="select1" class="hideLab" value="{!item.Competitor.Model__c}" onchange="{!c.existCompetitorsCompare}">
+                                    <option value="">choose one...</option>
+                                    <aura:iteration items="{!item.allModels}" var="Model">
+                                        <option value="{!Model}">{!Model}</option>
+                                    </aura:iteration>
+                                </lightning:select>
+                            </td>
+                            
+                            <td style="padding-top: 15px;text-align:center;">
+                                <a onclick="{!c.delSingleRow}" id="{!indexnew}" style="float:left">
+                                    <lightning:icon variant="error" iconName="utility:delete"
+                                        class="slds-icon slds-icon_small" size="small" alternativeText="Delete Row" />
+                                    <span class="slds-assistive-text">Delete Icon</span>
+                                </a>
+                                
+                                <aura:if isTrue="{!indexnew==(v.CompetitorsList[0].allNewCompetitors.length-1)}">
+                                    <a onclick="{!c.addRowData}" id="{!indexnew}">
+                                        <lightning:icon variant="error" iconName="utility:add"
+                                            class="slds-icon slds-icon_small" size="small" alternativeText="Add More" />
+                                        <span class="slds-assistive-text">Add More</span>
+                                    </a>
+                                </aura:if>
+                            </td>
+
+                        </tr>
+                    </aura:iteration>
+                </tbody>
+            </table>
+
+            <!--<div style="float: right !important;margin-top: 15px !important;">
+                <lightning:button  aura:id="buttonid"   label="Add More" onclick="{!c.addRowData}" variant="brand"  />
+            </div>-->
+        </div>
+        <!--Modal/Popup Box Footer Starts here-->
+        <footer class="slds-modal__footer">
+            <lightning:button variant="brand" label="Cancel" title="Cancel" onclick="{! c.closeModel}" />
+            <lightning:button variant="brand" label="Save" title="Save" onclick="{!c.saveData}" />
+        </footer>
+    </div>
+    <!--</section>-->
+</aura:component>

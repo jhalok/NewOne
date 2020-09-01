@@ -1,0 +1,21 @@
+.THIS .cardData{
+    margin: auto;
+    border: unset;
+    box-shadow: unset;
+    width: 60%;
+}
+.THIS .searchDeareInput{
+    
+}
+.THIS .tableStyle{
+    margin-bottom: 50px !important;
+}
+.THIS .addButton{
+    position: absolute;
+    right: 30px;
+    bottom: 0px;
+}
+.THIS .deleteSection{
+    padding-left: 20px;
+    padding-top: 18px;
+}

@@ -1,0 +1,4 @@
+<!--c:ACE_CloseParentFromChild-->
+<aura:event type="COMPONENT">
+    <!--simple event with no attributes-->
+</aura:event>
